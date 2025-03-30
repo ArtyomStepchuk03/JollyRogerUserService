@@ -3,16 +3,18 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: user_jolly_roger_postgres
+    container_name: ${POSTGRES_CONTAINER_NAME}
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: user_jolly_roger_postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
     expose:
-      - "5432"
+      - "${DB_PORT}"
     networks:
       - jolly_roger_user_net
     logging:
@@ -28,10 +30,12 @@ services:
 
   redis:
     image: redis:7
-    container_name: jolly_roger_user_redis
+    container_name: ${REDIS_CONTAINER_NAME}
     restart: always
+    env_file:
+      - .env
     expose:
-      - "6379"
+      - "${REDIS_PORT}"
     networks:
       - jolly_roger_user_net
     logging:
@@ -46,25 +50,27 @@ services:
       retries: 5
 
   userservice:
-    container_name: jolly_roger_user_service
+    container_name: ${SERVICE_CONTAINER_NAME}
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - "50051:50051"
+      - "${GRPC_PORT}:${GRPC_PORT}"
     depends_on:
       - postgres
       - redis
     networks:
       - jolly_roger_user_net
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: jolly_roger
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
 
 volumes:
   pgdata:

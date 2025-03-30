@@ -8,8 +8,8 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB() {
-	dsn := "host=localhost user=postgres password=postgres dbname=jolly_roger port=5000 sslmode=disable"
+func ConnectDB(host string, user string, password string, dbname string) {
+	dsn := "host=localhost user=postgres password=postgres dbname=user_jolly_roger_postgres port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД:", err)
