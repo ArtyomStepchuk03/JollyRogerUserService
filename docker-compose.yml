@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: user_jolly_roger_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: user_jolly_roger_postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - jolly_roger_user_net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: jolly_roger_user_redis
+    restart: always
+    expose:
+      - "6379"
+    networks:
+      - jolly_roger_user_net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  userservice:
+    container_name: jolly_roger_user_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - jolly_roger_user_net
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: jolly_roger
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+volumes:
+  pgdata:
+
+networks:
+  jolly_roger_user_service:
+    name: jolly_roger_user_net
+
