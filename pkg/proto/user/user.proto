@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package user;
+option go_package = "github.com/yourusername/tg-team-finder/user-service/pkg/proto/user";
+
+service UserService {
+  // Управление профилем
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc GetUserByTelegramID(GetUserByTelegramIDRequest) returns (UserResponse);
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+
+  // Управление предпочтениями
+  rpc AddUserPreference(AddUserPreferenceRequest) returns (SimpleResponse);
+  rpc RemoveUserPreference(RemoveUserPreferenceRequest) returns (SimpleResponse);
+  rpc GetUserPreferences(GetUserPreferencesRequest) returns (UserPreferencesResponse);
+
+  // Геолокация
+  rpc UpdateUserLocation(UpdateUserLocationRequest) returns (SimpleResponse);
+  rpc GetUserLocation(GetUserLocationRequest) returns (UserLocationResponse);
+  rpc FindNearbyUsers(FindNearbyUsersRequest) returns (UsersResponse);
+
+  // Статистика и рейтинг
+  rpc GetUserStats(GetUserStatsRequest) returns (UserStatsResponse);
+  rpc UpdateUserRating(UpdateUserRatingRequest) returns (UserResponse);
+
+  // Настройки уведомлений
+  rpc UpdateNotificationSettings(UpdateNotificationSettingsRequest) returns (SimpleResponse);
+  rpc GetNotificationSettings(GetNotificationSettingsRequest) returns (NotificationSettingsResponse);
+}
+
+// Запросы и ответы
+
+// GetUserRequest - запрос для получения пользователя по ID
+message GetUserRequest {
+  uint64 id = 1;
+}
+
+// GetUserByTelegramIDRequest - запрос для получения пользователя по Telegram ID
+message GetUserByTelegramIDRequest {
+  int64 telegram_id = 1;
+}
+
+// CreateUserRequest - запрос для создания пользователя
+message CreateUserRequest {
+  int64 telegram_id = 1;
+  string username = 2;
+  string bio = 3;
+}
+
+// UpdateUserRequest - запрос для обновления пользователя
+message UpdateUserRequest {
+  uint64 id = 1;
+  string username = 2;
+  string bio = 3;
+}
+
+// UserResponse - ответ с данными пользователя
+message UserResponse {
+  uint64 id = 1;
+  int64 telegram_id = 2;
+  string username = 3;
+  string bio = 4;
+  float rating = 5;
+}
+
+// AddUserPreferenceRequest - запрос для добавления предпочтения
+message AddUserPreferenceRequest {
+  uint64 user_id = 1;
+  uint64 tag_id = 2;
+}
+
+// RemoveUserPreferenceRequest - запрос для удаления предпочтения
+message RemoveUserPreferenceRequest {
+  uint64 user_id = 1;
+  uint64 tag_id = 2;
+}
+
+// GetUserPreferencesRequest - запрос для получения предпочтений
+message GetUserPreferencesRequest {
+  uint64 user_id = 1;
+}
+
+// UserPreference - модель предпочтения
+message UserPreference {
+  uint64 tag_id = 1;
+}
+
+// UserPreferencesResponse - ответ со списком предпочтений
+message UserPreferencesResponse {
+  repeated UserPreference preferences = 1;
+}
+
+// UpdateUserLocationRequest - запрос для обновления местоположения
+message UpdateUserLocationRequest {
+  uint64 user_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string city = 4;
+  string region = 5;
+  string country = 6;
+}
+
+// GetUserLocationRequest - запрос для получения местоположения
+message GetUserLocationRequest {
+  uint64 user_id = 1;
+}
+
+// UserLocationResponse - ответ с местоположением
+message UserLocationResponse {
+  double latitude = 1;
+  double longitude = 2;
+  string city = 3;
+  string region = 4;
+  string country = 5;
+}
+
+// FindNearbyUsersRequest - запрос для поиска пользователей рядом
+message FindNearbyUsersRequest {
+  double latitude = 1;
+  double longitude = 2;
+  double radius_km = 3;
+  uint64 limit = 4;
+}
+
+// UsersResponse - ответ со списком пользователей
+message UsersResponse {
+  repeated UserResponse users = 1;
+}
+
+// GetUserStatsRequest - запрос для получения статистики пользователя
+message GetUserStatsRequest {
+  uint64 user_id = 1;
+}
+
+// UserStatsResponse - ответ со статистикой пользователя
+message UserStatsResponse {
+  uint64 user_id = 1;
+  int32 events_created = 2;
+  int32 events_participated = 3;
+  string created_at = 4;
+  string last_active_at = 5;
+  bool is_active = 6;
+}
+
+// UpdateUserRatingRequest - запрос для обновления рейтинга пользователя
+message UpdateUserRatingRequest {
+  uint64 user_id = 1;
+  float rating_change = 2; // Изменение рейтинга (положительное или отрицательное)
+}
+
+// UpdateNotificationSettingsRequest - запрос для обновления настроек уведомлений
+message UpdateNotificationSettingsRequest {
+  uint64 user_id = 1;
+  bool new_event_notification = 2;
+}
+
+// GetNotificationSettingsRequest - запрос для получения настроек уведомлений
+message GetNotificationSettingsRequest {
+  uint64 user_id = 1;
+}
+
+// NotificationSettingsResponse - ответ с настройками уведомлений
+message NotificationSettingsResponse {
+  bool new_event_notification = 1;
+}
+
+// SimpleResponse - простой ответ об успешности операции
+message SimpleResponse {
+  bool success = 1;
+  string message = 2;
+}
