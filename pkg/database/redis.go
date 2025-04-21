@@ -1,9 +1,9 @@
 package database
 
 import (
+	"JollyRogerUserService/config"
 	"context"
 	"github.com/redis/go-redis/v9"
-	"github.com/yourusername/tg-team-finder/user-service/config"
 	"time"
 )
 

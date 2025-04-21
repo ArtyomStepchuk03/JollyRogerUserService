@@ -1333,8 +1333,8 @@ const file_pkg_proto_user_user_proto_rawDesc = "" +
 	"\x16new_event_notification\x18\x01 \x01(\bR\x14newEventNotification\"D\n" +
 	"\x0eSimpleResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xa4\b\n" +
-	"\vUserService\x123\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xae\b\n" +
+	"\x15JollyRogerUserService\x123\n" +
 	"\aGetUser\x12\x14.user.GetUserRequest\x1a\x12.user.UserResponse\x12K\n" +
 	"\x13GetUserByTelegramID\x12 .user.GetUserByTelegramIDRequest\x1a\x12.user.UserResponse\x129\n" +
 	"\n" +
@@ -1350,7 +1350,7 @@ const file_pkg_proto_user_user_proto_rawDesc = "" +
 	"\fGetUserStats\x12\x19.user.GetUserStatsRequest\x1a\x17.user.UserStatsResponse\x12E\n" +
 	"\x10UpdateUserRating\x12\x1d.user.UpdateUserRatingRequest\x1a\x12.user.UserResponse\x12[\n" +
 	"\x1aUpdateNotificationSettings\x12'.user.UpdateNotificationSettingsRequest\x1a\x14.user.SimpleResponse\x12c\n" +
-	"\x17GetNotificationSettings\x12$.user.GetNotificationSettingsRequest\x1a\".user.NotificationSettingsResponseBDZBgithub.com/yourusername/tg-team-finder/user-service/pkg/proto/userb\x06proto3"
+	"\x17GetNotificationSettings\x12$.user.GetNotificationSettingsRequest\x1a\".user.NotificationSettingsResponseB&Z$JollyRogerUserService/pkg/proto/userb\x06proto3"
 
 var (
 	file_pkg_proto_user_user_proto_rawDescOnce sync.Once
@@ -1392,34 +1392,34 @@ var file_pkg_proto_user_user_proto_goTypes = []any{
 var file_pkg_proto_user_user_proto_depIdxs = []int32{
 	8,  // 0: user.UserPreferencesResponse.preferences:type_name -> user.UserPreference
 	4,  // 1: user.UsersResponse.users:type_name -> user.UserResponse
-	0,  // 2: user.UserService.GetUser:input_type -> user.GetUserRequest
-	1,  // 3: user.UserService.GetUserByTelegramID:input_type -> user.GetUserByTelegramIDRequest
-	2,  // 4: user.UserService.CreateUser:input_type -> user.CreateUserRequest
-	3,  // 5: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
-	5,  // 6: user.UserService.AddUserPreference:input_type -> user.AddUserPreferenceRequest
-	6,  // 7: user.UserService.RemoveUserPreference:input_type -> user.RemoveUserPreferenceRequest
-	7,  // 8: user.UserService.GetUserPreferences:input_type -> user.GetUserPreferencesRequest
-	10, // 9: user.UserService.UpdateUserLocation:input_type -> user.UpdateUserLocationRequest
-	11, // 10: user.UserService.GetUserLocation:input_type -> user.GetUserLocationRequest
-	13, // 11: user.UserService.FindNearbyUsers:input_type -> user.FindNearbyUsersRequest
-	15, // 12: user.UserService.GetUserStats:input_type -> user.GetUserStatsRequest
-	17, // 13: user.UserService.UpdateUserRating:input_type -> user.UpdateUserRatingRequest
-	18, // 14: user.UserService.UpdateNotificationSettings:input_type -> user.UpdateNotificationSettingsRequest
-	19, // 15: user.UserService.GetNotificationSettings:input_type -> user.GetNotificationSettingsRequest
-	4,  // 16: user.UserService.GetUser:output_type -> user.UserResponse
-	4,  // 17: user.UserService.GetUserByTelegramID:output_type -> user.UserResponse
-	4,  // 18: user.UserService.CreateUser:output_type -> user.UserResponse
-	4,  // 19: user.UserService.UpdateUser:output_type -> user.UserResponse
-	21, // 20: user.UserService.AddUserPreference:output_type -> user.SimpleResponse
-	21, // 21: user.UserService.RemoveUserPreference:output_type -> user.SimpleResponse
-	9,  // 22: user.UserService.GetUserPreferences:output_type -> user.UserPreferencesResponse
-	21, // 23: user.UserService.UpdateUserLocation:output_type -> user.SimpleResponse
-	12, // 24: user.UserService.GetUserLocation:output_type -> user.UserLocationResponse
-	14, // 25: user.UserService.FindNearbyUsers:output_type -> user.UsersResponse
-	16, // 26: user.UserService.GetUserStats:output_type -> user.UserStatsResponse
-	4,  // 27: user.UserService.UpdateUserRating:output_type -> user.UserResponse
-	21, // 28: user.UserService.UpdateNotificationSettings:output_type -> user.SimpleResponse
-	20, // 29: user.UserService.GetNotificationSettings:output_type -> user.NotificationSettingsResponse
+	0,  // 2: user.JollyRogerUserService.GetUser:input_type -> user.GetUserRequest
+	1,  // 3: user.JollyRogerUserService.GetUserByTelegramID:input_type -> user.GetUserByTelegramIDRequest
+	2,  // 4: user.JollyRogerUserService.CreateUser:input_type -> user.CreateUserRequest
+	3,  // 5: user.JollyRogerUserService.UpdateUser:input_type -> user.UpdateUserRequest
+	5,  // 6: user.JollyRogerUserService.AddUserPreference:input_type -> user.AddUserPreferenceRequest
+	6,  // 7: user.JollyRogerUserService.RemoveUserPreference:input_type -> user.RemoveUserPreferenceRequest
+	7,  // 8: user.JollyRogerUserService.GetUserPreferences:input_type -> user.GetUserPreferencesRequest
+	10, // 9: user.JollyRogerUserService.UpdateUserLocation:input_type -> user.UpdateUserLocationRequest
+	11, // 10: user.JollyRogerUserService.GetUserLocation:input_type -> user.GetUserLocationRequest
+	13, // 11: user.JollyRogerUserService.FindNearbyUsers:input_type -> user.FindNearbyUsersRequest
+	15, // 12: user.JollyRogerUserService.GetUserStats:input_type -> user.GetUserStatsRequest
+	17, // 13: user.JollyRogerUserService.UpdateUserRating:input_type -> user.UpdateUserRatingRequest
+	18, // 14: user.JollyRogerUserService.UpdateNotificationSettings:input_type -> user.UpdateNotificationSettingsRequest
+	19, // 15: user.JollyRogerUserService.GetNotificationSettings:input_type -> user.GetNotificationSettingsRequest
+	4,  // 16: user.JollyRogerUserService.GetUser:output_type -> user.UserResponse
+	4,  // 17: user.JollyRogerUserService.GetUserByTelegramID:output_type -> user.UserResponse
+	4,  // 18: user.JollyRogerUserService.CreateUser:output_type -> user.UserResponse
+	4,  // 19: user.JollyRogerUserService.UpdateUser:output_type -> user.UserResponse
+	21, // 20: user.JollyRogerUserService.AddUserPreference:output_type -> user.SimpleResponse
+	21, // 21: user.JollyRogerUserService.RemoveUserPreference:output_type -> user.SimpleResponse
+	9,  // 22: user.JollyRogerUserService.GetUserPreferences:output_type -> user.UserPreferencesResponse
+	21, // 23: user.JollyRogerUserService.UpdateUserLocation:output_type -> user.SimpleResponse
+	12, // 24: user.JollyRogerUserService.GetUserLocation:output_type -> user.UserLocationResponse
+	14, // 25: user.JollyRogerUserService.FindNearbyUsers:output_type -> user.UsersResponse
+	16, // 26: user.JollyRogerUserService.GetUserStats:output_type -> user.UserStatsResponse
+	4,  // 27: user.JollyRogerUserService.UpdateUserRating:output_type -> user.UserResponse
+	21, // 28: user.JollyRogerUserService.UpdateNotificationSettings:output_type -> user.SimpleResponse
+	20, // 29: user.JollyRogerUserService.GetNotificationSettings:output_type -> user.NotificationSettingsResponse
 	16, // [16:30] is the sub-list for method output_type
 	2,  // [2:16] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name

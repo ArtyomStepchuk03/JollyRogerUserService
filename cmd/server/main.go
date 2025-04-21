@@ -1,97 +1,84 @@
-package grpc
+package main
 
 import (
-	"context"
+	"JollyRogerUserService/config"
+	"JollyRogerUserService/internal/delivery/grpc"
+	"JollyRogerUserService/internal/repository/postgres"
+	"JollyRogerUserService/internal/repository/redis"
+	"JollyRogerUserService/internal/service"
+	"JollyRogerUserService/pkg/database"
+	"JollyRogerUserService/pkg/logger"
 	"fmt"
-	pb "github.com/yourusername/tg-team-finder/user-service/pkg/proto/user"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
+
+	userProto "JollyRogerUserService/pkg/proto/user"
+	"go.uber.org/zap"
+	grpcServer "google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
-// Server представляет собой gRPC сервер
-type Server struct {
-	grpcServer *grpc.Server
-	logger     *zap.Logger
-	port       int
-	handler    *UserHandler
-}
+func main() {
+	// Инициализация логгера
+	log := logger.NewLogger()
+	log.Info("Starting user service")
 
-// NewServer создает новый экземпляр gRPC сервера
-func NewServer(handler *UserHandler, logger *zap.Logger, port int) *Server {
-	return &Server{
-		logger:  logger,
-		port:    port,
-		handler: handler,
-	}
-}
-
-// Run запускает gRPC сервер
-func (s *Server) Run() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	// Загрузка конфигурации
+	cfg, err := config.LoadConfig()
 	if err != nil {
-		s.logger.Error("Failed to listen", zap.Error(err), zap.Int("port", s.port))
-		return err
+		log.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	opts := []grpc.ServerOption{
-		grpc.ChainUnaryInterceptor(
-			s.loggingInterceptor(),
-			s.recoveryInterceptor(),
-		),
+	// Подключение к PostgreSQL
+	db, err := database.NewPostgresDB(cfg.Postgres)
+	if err != nil {
+		log.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
+	}
+	log.Info("Connected to PostgreSQL")
+
+	// Подключение к Redis
+	redisClient, err := database.NewRedisClient(cfg.Redis)
+	if err != nil {
+		log.Fatal("Failed to connect to Redis", zap.Error(err))
+	}
+	log.Info("Connected to Redis")
+
+	// Инициализация репозиториев
+	userRepo := postgres.NewUserRepository(db)
+	cacheRepo := redis.NewCacheRepository(redisClient)
+
+	// Инициализация сервиса
+	userService := service.NewUserService(userRepo, cacheRepo, log)
+
+	// Инициализация gRPC сервера
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPC.Port))
+	if err != nil {
+		log.Fatal("Failed to listen", zap.Error(err))
 	}
 
-	s.grpcServer = grpc.NewServer(opts...)
-	pb.RegisterUserServiceServer(s.grpcServer, s.handler)
+	s := grpcServer.NewServer()
+	userHandler := grpc.NewUserHandler(userService, log)
+	userProto.RegisterUserServiceServer(s, userHandler)
 
-	// Включаем reflection для удобства отладки через grpcurl
-	reflection.Register(s.grpcServer)
+	// Включение reflection для удобства отладки (в production можно отключить)
+	reflection.Register(s)
 
-	s.logger.Info("Starting gRPC server", zap.Int("port", s.port))
-	return s.grpcServer.Serve(lis)
-}
-
-// Stop останавливает gRPC сервер
-func (s *Server) Stop() {
-	s.logger.Info("Stopping gRPC server")
-	s.grpcServer.GracefulStop()
-}
-
-// loggingInterceptor создает перехватчик для логирования запросов
-func (s *Server) loggingInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		s.logger.Info("gRPC request",
-			zap.String("method", info.FullMethod),
-			zap.Any("request", req))
-
-		resp, err := handler(ctx, req)
-
-		if err != nil {
-			s.logger.Error("gRPC error",
-				zap.String("method", info.FullMethod),
-				zap.Error(err))
-		} else {
-			s.logger.Info("gRPC response",
-				zap.String("method", info.FullMethod),
-				zap.Any("response", resp))
+	// Запуск gRPC сервера в отдельной горутине
+	go func() {
+		log.Info("Starting gRPC server", zap.Int("port", cfg.GRPC.Port))
+		if err := s.Serve(lis); err != nil {
+			log.Fatal("Failed to serve", zap.Error(err))
 		}
+	}()
 
-		return resp, err
-	}
-}
+	// Обработка сигналов для graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
-// recoveryInterceptor создает перехватчик для восстановления после паники
-func (s *Server) recoveryInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		defer func() {
-			if r := recover(); r != nil {
-				s.logger.Error("Recovered from panic",
-					zap.Any("panic", r),
-					zap.String("method", info.FullMethod))
-			}
-		}()
-
-		return handler(ctx, req)
-	}
+	log.Info("Shutting down server...")
+	s.GracefulStop()
+	log.Info("Server stopped")
 }

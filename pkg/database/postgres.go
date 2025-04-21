@@ -1,9 +1,9 @@
 package database
 
 import (
+	"JollyRogerUserService/config"
+	"JollyRogerUserService/internal/models"
 	"fmt"
-	"github.com/yourusername/tg-team-finder/user-service/config"
-	"github.com/yourusername/tg-team-finder/user-service/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -22,8 +22,8 @@ func NewPostgresDB(cfg config.PostgresConfig) (*gorm.DB, error) {
 		logger.Config{
 			SlowThreshold:             time.Second,  // Порог для медленных запросов
 			LogLevel:                  logger.Error, // Уровень логирования (в production лучше использовать Error)
-			IgnoreRecordNotFoundError: true,        // Игнорировать ошибки "запись не найдена"
-			Colorful:                  true,        // Цветной вывод в консоль
+			IgnoreRecordNotFoundError: true,         // Игнорировать ошибки "запись не найдена"
+			Colorful:                  true,         // Цветной вывод в консоль
 		},
 	)
 
@@ -39,13 +39,13 @@ func NewPostgresDB(cfg config.PostgresConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Установка максимального количества открытых соединений
 	sqlDB.SetMaxOpenConns(25)
-	
+
 	// Установка максимального количества соединений в пуле
 	sqlDB.SetMaxIdleConns(10)
-	
+
 	// Установка максимального времени жизни соединения
 	sqlDB.SetConnMaxLifetime(time.Hour)
 

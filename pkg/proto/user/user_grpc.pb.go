@@ -19,26 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_GetUser_FullMethodName                    = "/user.UserService/GetUser"
-	UserService_GetUserByTelegramID_FullMethodName        = "/user.UserService/GetUserByTelegramID"
-	UserService_CreateUser_FullMethodName                 = "/user.UserService/CreateUser"
-	UserService_UpdateUser_FullMethodName                 = "/user.UserService/UpdateUser"
-	UserService_AddUserPreference_FullMethodName          = "/user.UserService/AddUserPreference"
-	UserService_RemoveUserPreference_FullMethodName       = "/user.UserService/RemoveUserPreference"
-	UserService_GetUserPreferences_FullMethodName         = "/user.UserService/GetUserPreferences"
-	UserService_UpdateUserLocation_FullMethodName         = "/user.UserService/UpdateUserLocation"
-	UserService_GetUserLocation_FullMethodName            = "/user.UserService/GetUserLocation"
-	UserService_FindNearbyUsers_FullMethodName            = "/user.UserService/FindNearbyUsers"
-	UserService_GetUserStats_FullMethodName               = "/user.UserService/GetUserStats"
-	UserService_UpdateUserRating_FullMethodName           = "/user.UserService/UpdateUserRating"
-	UserService_UpdateNotificationSettings_FullMethodName = "/user.UserService/UpdateNotificationSettings"
-	UserService_GetNotificationSettings_FullMethodName    = "/user.UserService/GetNotificationSettings"
+	JollyRogerUserService_GetUser_FullMethodName                    = "/user.JollyRogerUserService/GetUser"
+	JollyRogerUserService_GetUserByTelegramID_FullMethodName        = "/user.JollyRogerUserService/GetUserByTelegramID"
+	JollyRogerUserService_CreateUser_FullMethodName                 = "/user.JollyRogerUserService/CreateUser"
+	JollyRogerUserService_UpdateUser_FullMethodName                 = "/user.JollyRogerUserService/UpdateUser"
+	JollyRogerUserService_AddUserPreference_FullMethodName          = "/user.JollyRogerUserService/AddUserPreference"
+	JollyRogerUserService_RemoveUserPreference_FullMethodName       = "/user.JollyRogerUserService/RemoveUserPreference"
+	JollyRogerUserService_GetUserPreferences_FullMethodName         = "/user.JollyRogerUserService/GetUserPreferences"
+	JollyRogerUserService_UpdateUserLocation_FullMethodName         = "/user.JollyRogerUserService/UpdateUserLocation"
+	JollyRogerUserService_GetUserLocation_FullMethodName            = "/user.JollyRogerUserService/GetUserLocation"
+	JollyRogerUserService_FindNearbyUsers_FullMethodName            = "/user.JollyRogerUserService/FindNearbyUsers"
+	JollyRogerUserService_GetUserStats_FullMethodName               = "/user.JollyRogerUserService/GetUserStats"
+	JollyRogerUserService_UpdateUserRating_FullMethodName           = "/user.JollyRogerUserService/UpdateUserRating"
+	JollyRogerUserService_UpdateNotificationSettings_FullMethodName = "/user.JollyRogerUserService/UpdateNotificationSettings"
+	JollyRogerUserService_GetNotificationSettings_FullMethodName    = "/user.JollyRogerUserService/GetNotificationSettings"
 )
 
-// UserServiceClient is the client API for UserService service.
+// JollyRogerUserServiceClient is the client API for JollyRogerUserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UserServiceClient interface {
+type JollyRogerUserServiceClient interface {
 	// Управление профилем
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserByTelegramID(ctx context.Context, in *GetUserByTelegramIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -60,158 +60,158 @@ type UserServiceClient interface {
 	GetNotificationSettings(ctx context.Context, in *GetNotificationSettingsRequest, opts ...grpc.CallOption) (*NotificationSettingsResponse, error)
 }
 
-type userServiceClient struct {
+type jollyRogerUserServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
-	return &userServiceClient{cc}
+func NewJollyRogerUserServiceClient(cc grpc.ClientConnInterface) JollyRogerUserServiceClient {
+	return &jollyRogerUserServiceClient{cc}
 }
 
-func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *jollyRogerUserServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserByTelegramID(ctx context.Context, in *GetUserByTelegramIDRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *jollyRogerUserServiceClient) GetUserByTelegramID(ctx context.Context, in *GetUserByTelegramIDRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUserByTelegramID_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetUserByTelegramID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *jollyRogerUserServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_CreateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *jollyRogerUserServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, UserService_UpdateUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_UpdateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) AddUserPreference(ctx context.Context, in *AddUserPreferenceRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
+func (c *jollyRogerUserServiceClient) AddUserPreference(ctx context.Context, in *AddUserPreferenceRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SimpleResponse)
-	err := c.cc.Invoke(ctx, UserService_AddUserPreference_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_AddUserPreference_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) RemoveUserPreference(ctx context.Context, in *RemoveUserPreferenceRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
+func (c *jollyRogerUserServiceClient) RemoveUserPreference(ctx context.Context, in *RemoveUserPreferenceRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SimpleResponse)
-	err := c.cc.Invoke(ctx, UserService_RemoveUserPreference_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_RemoveUserPreference_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserPreferences(ctx context.Context, in *GetUserPreferencesRequest, opts ...grpc.CallOption) (*UserPreferencesResponse, error) {
+func (c *jollyRogerUserServiceClient) GetUserPreferences(ctx context.Context, in *GetUserPreferencesRequest, opts ...grpc.CallOption) (*UserPreferencesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserPreferencesResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUserPreferences_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetUserPreferences_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUserLocation(ctx context.Context, in *UpdateUserLocationRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
+func (c *jollyRogerUserServiceClient) UpdateUserLocation(ctx context.Context, in *UpdateUserLocationRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SimpleResponse)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserLocation_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_UpdateUserLocation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserLocation(ctx context.Context, in *GetUserLocationRequest, opts ...grpc.CallOption) (*UserLocationResponse, error) {
+func (c *jollyRogerUserServiceClient) GetUserLocation(ctx context.Context, in *GetUserLocationRequest, opts ...grpc.CallOption) (*UserLocationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserLocationResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUserLocation_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetUserLocation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) FindNearbyUsers(ctx context.Context, in *FindNearbyUsersRequest, opts ...grpc.CallOption) (*UsersResponse, error) {
+func (c *jollyRogerUserServiceClient) FindNearbyUsers(ctx context.Context, in *FindNearbyUsersRequest, opts ...grpc.CallOption) (*UsersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UsersResponse)
-	err := c.cc.Invoke(ctx, UserService_FindNearbyUsers_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_FindNearbyUsers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserStats(ctx context.Context, in *GetUserStatsRequest, opts ...grpc.CallOption) (*UserStatsResponse, error) {
+func (c *jollyRogerUserServiceClient) GetUserStats(ctx context.Context, in *GetUserStatsRequest, opts ...grpc.CallOption) (*UserStatsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserStatsResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUserStats_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetUserStats_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUserRating(ctx context.Context, in *UpdateUserRatingRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *jollyRogerUserServiceClient) UpdateUserRating(ctx context.Context, in *UpdateUserRatingRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserRating_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_UpdateUserRating_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateNotificationSettings(ctx context.Context, in *UpdateNotificationSettingsRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
+func (c *jollyRogerUserServiceClient) UpdateNotificationSettings(ctx context.Context, in *UpdateNotificationSettingsRequest, opts ...grpc.CallOption) (*SimpleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SimpleResponse)
-	err := c.cc.Invoke(ctx, UserService_UpdateNotificationSettings_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_UpdateNotificationSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetNotificationSettings(ctx context.Context, in *GetNotificationSettingsRequest, opts ...grpc.CallOption) (*NotificationSettingsResponse, error) {
+func (c *jollyRogerUserServiceClient) GetNotificationSettings(ctx context.Context, in *GetNotificationSettingsRequest, opts ...grpc.CallOption) (*NotificationSettingsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(NotificationSettingsResponse)
-	err := c.cc.Invoke(ctx, UserService_GetNotificationSettings_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_GetNotificationSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserServiceServer is the server API for UserService service.
-// All implementations must embed UnimplementedUserServiceServer
+// JollyRogerUserServiceServer is the server API for JollyRogerUserService service.
+// All implementations must embed UnimplementedJollyRogerUserServiceServer
 // for forward compatibility.
-type UserServiceServer interface {
+type JollyRogerUserServiceServer interface {
 	// Управление профилем
 	GetUser(context.Context, *GetUserRequest) (*UserResponse, error)
 	GetUserByTelegramID(context.Context, *GetUserByTelegramIDRequest) (*UserResponse, error)
@@ -231,393 +231,393 @@ type UserServiceServer interface {
 	// Настройки уведомлений
 	UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*SimpleResponse, error)
 	GetNotificationSettings(context.Context, *GetNotificationSettingsRequest) (*NotificationSettingsResponse, error)
-	mustEmbedUnimplementedUserServiceServer()
+	mustEmbedUnimplementedJollyRogerUserServiceServer()
 }
 
-// UnimplementedUserServiceServer must be embedded to have
+// UnimplementedJollyRogerUserServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedUserServiceServer struct{}
+type UnimplementedJollyRogerUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) (*UserResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetUser(context.Context, *GetUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserByTelegramID(context.Context, *GetUserByTelegramIDRequest) (*UserResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetUserByTelegramID(context.Context, *GetUserByTelegramIDRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByTelegramID not implemented")
 }
-func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*UserResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServiceServer) AddUserPreference(context.Context, *AddUserPreferenceRequest) (*SimpleResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) AddUserPreference(context.Context, *AddUserPreferenceRequest) (*SimpleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddUserPreference not implemented")
 }
-func (UnimplementedUserServiceServer) RemoveUserPreference(context.Context, *RemoveUserPreferenceRequest) (*SimpleResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) RemoveUserPreference(context.Context, *RemoveUserPreferenceRequest) (*SimpleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveUserPreference not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserPreferences(context.Context, *GetUserPreferencesRequest) (*UserPreferencesResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetUserPreferences(context.Context, *GetUserPreferencesRequest) (*UserPreferencesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPreferences not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUserLocation(context.Context, *UpdateUserLocationRequest) (*SimpleResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) UpdateUserLocation(context.Context, *UpdateUserLocationRequest) (*SimpleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserLocation not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserLocation(context.Context, *GetUserLocationRequest) (*UserLocationResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetUserLocation(context.Context, *GetUserLocationRequest) (*UserLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserLocation not implemented")
 }
-func (UnimplementedUserServiceServer) FindNearbyUsers(context.Context, *FindNearbyUsersRequest) (*UsersResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) FindNearbyUsers(context.Context, *FindNearbyUsersRequest) (*UsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindNearbyUsers not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserStats(context.Context, *GetUserStatsRequest) (*UserStatsResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetUserStats(context.Context, *GetUserStatsRequest) (*UserStatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserStats not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUserRating(context.Context, *UpdateUserRatingRequest) (*UserResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) UpdateUserRating(context.Context, *UpdateUserRatingRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserRating not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*SimpleResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*SimpleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateNotificationSettings not implemented")
 }
-func (UnimplementedUserServiceServer) GetNotificationSettings(context.Context, *GetNotificationSettingsRequest) (*NotificationSettingsResponse, error) {
+func (UnimplementedJollyRogerUserServiceServer) GetNotificationSettings(context.Context, *GetNotificationSettingsRequest) (*NotificationSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotificationSettings not implemented")
 }
-func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
-func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedJollyRogerUserServiceServer) mustEmbedUnimplementedJollyRogerUserServiceServer() {}
+func (UnimplementedJollyRogerUserServiceServer) testEmbeddedByValue()                               {}
 
-// UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserServiceServer will
+// UnsafeJollyRogerUserServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to JollyRogerUserServiceServer will
 // result in compilation errors.
-type UnsafeUserServiceServer interface {
-	mustEmbedUnimplementedUserServiceServer()
+type UnsafeJollyRogerUserServiceServer interface {
+	mustEmbedUnimplementedJollyRogerUserServiceServer()
 }
 
-func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
-	// If the following call pancis, it indicates UnimplementedUserServiceServer was
+func RegisterJollyRogerUserServiceServer(s grpc.ServiceRegistrar, srv JollyRogerUserServiceServer) {
+	// If the following call pancis, it indicates UnimplementedJollyRogerUserServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&UserService_ServiceDesc, srv)
+	s.RegisterService(&JollyRogerUserService_ServiceDesc, srv)
 }
 
-func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUser(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUser_FullMethodName,
+		FullMethod: JollyRogerUserService_GetUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUser(ctx, req.(*GetUserRequest))
+		return srv.(JollyRogerUserServiceServer).GetUser(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUserByTelegramID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetUserByTelegramID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserByTelegramIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUserByTelegramID(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetUserByTelegramID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUserByTelegramID_FullMethodName,
+		FullMethod: JollyRogerUserService_GetUserByTelegramID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserByTelegramID(ctx, req.(*GetUserByTelegramIDRequest))
+		return srv.(JollyRogerUserServiceServer).GetUserByTelegramID(ctx, req.(*GetUserByTelegramIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).CreateUser(ctx, in)
+		return srv.(JollyRogerUserServiceServer).CreateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_CreateUser_FullMethodName,
+		FullMethod: JollyRogerUserService_CreateUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+		return srv.(JollyRogerUserServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUser(ctx, in)
+		return srv.(JollyRogerUserServiceServer).UpdateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_UpdateUser_FullMethodName,
+		FullMethod: JollyRogerUserService_UpdateUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+		return srv.(JollyRogerUserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_AddUserPreference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_AddUserPreference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddUserPreferenceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).AddUserPreference(ctx, in)
+		return srv.(JollyRogerUserServiceServer).AddUserPreference(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_AddUserPreference_FullMethodName,
+		FullMethod: JollyRogerUserService_AddUserPreference_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).AddUserPreference(ctx, req.(*AddUserPreferenceRequest))
+		return srv.(JollyRogerUserServiceServer).AddUserPreference(ctx, req.(*AddUserPreferenceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_RemoveUserPreference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_RemoveUserPreference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveUserPreferenceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).RemoveUserPreference(ctx, in)
+		return srv.(JollyRogerUserServiceServer).RemoveUserPreference(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_RemoveUserPreference_FullMethodName,
+		FullMethod: JollyRogerUserService_RemoveUserPreference_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).RemoveUserPreference(ctx, req.(*RemoveUserPreferenceRequest))
+		return srv.(JollyRogerUserServiceServer).RemoveUserPreference(ctx, req.(*RemoveUserPreferenceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUserPreferences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetUserPreferences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserPreferencesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUserPreferences(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetUserPreferences(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUserPreferences_FullMethodName,
+		FullMethod: JollyRogerUserService_GetUserPreferences_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserPreferences(ctx, req.(*GetUserPreferencesRequest))
+		return srv.(JollyRogerUserServiceServer).GetUserPreferences(ctx, req.(*GetUserPreferencesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_UpdateUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserLocationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserLocation(ctx, in)
+		return srv.(JollyRogerUserServiceServer).UpdateUserLocation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_UpdateUserLocation_FullMethodName,
+		FullMethod: JollyRogerUserService_UpdateUserLocation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserLocation(ctx, req.(*UpdateUserLocationRequest))
+		return srv.(JollyRogerUserServiceServer).UpdateUserLocation(ctx, req.(*UpdateUserLocationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserLocationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUserLocation(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetUserLocation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUserLocation_FullMethodName,
+		FullMethod: JollyRogerUserService_GetUserLocation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserLocation(ctx, req.(*GetUserLocationRequest))
+		return srv.(JollyRogerUserServiceServer).GetUserLocation(ctx, req.(*GetUserLocationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_FindNearbyUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_FindNearbyUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FindNearbyUsersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).FindNearbyUsers(ctx, in)
+		return srv.(JollyRogerUserServiceServer).FindNearbyUsers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_FindNearbyUsers_FullMethodName,
+		FullMethod: JollyRogerUserService_FindNearbyUsers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FindNearbyUsers(ctx, req.(*FindNearbyUsersRequest))
+		return srv.(JollyRogerUserServiceServer).FindNearbyUsers(ctx, req.(*FindNearbyUsersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUserStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetUserStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserStatsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUserStats(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetUserStats(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUserStats_FullMethodName,
+		FullMethod: JollyRogerUserService_GetUserStats_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserStats(ctx, req.(*GetUserStatsRequest))
+		return srv.(JollyRogerUserServiceServer).GetUserStats(ctx, req.(*GetUserStatsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateUserRating_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_UpdateUserRating_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserRatingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserRating(ctx, in)
+		return srv.(JollyRogerUserServiceServer).UpdateUserRating(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_UpdateUserRating_FullMethodName,
+		FullMethod: JollyRogerUserService_UpdateUserRating_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserRating(ctx, req.(*UpdateUserRatingRequest))
+		return srv.(JollyRogerUserServiceServer).UpdateUserRating(ctx, req.(*UpdateUserRatingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateNotificationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_UpdateNotificationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateNotificationSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateNotificationSettings(ctx, in)
+		return srv.(JollyRogerUserServiceServer).UpdateNotificationSettings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_UpdateNotificationSettings_FullMethodName,
+		FullMethod: JollyRogerUserService_UpdateNotificationSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateNotificationSettings(ctx, req.(*UpdateNotificationSettingsRequest))
+		return srv.(JollyRogerUserServiceServer).UpdateNotificationSettings(ctx, req.(*UpdateNotificationSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetNotificationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _JollyRogerUserService_GetNotificationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetNotificationSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetNotificationSettings(ctx, in)
+		return srv.(JollyRogerUserServiceServer).GetNotificationSettings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetNotificationSettings_FullMethodName,
+		FullMethod: JollyRogerUserService_GetNotificationSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetNotificationSettings(ctx, req.(*GetNotificationSettingsRequest))
+		return srv.(JollyRogerUserServiceServer).GetNotificationSettings(ctx, req.(*GetNotificationSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
+// JollyRogerUserService_ServiceDesc is the grpc.ServiceDesc for JollyRogerUserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.UserService",
-	HandlerType: (*UserServiceServer)(nil),
+var JollyRogerUserService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user.JollyRogerUserService",
+	HandlerType: (*JollyRogerUserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUser",
-			Handler:    _UserService_GetUser_Handler,
+			Handler:    _JollyRogerUserService_GetUser_Handler,
 		},
 		{
 			MethodName: "GetUserByTelegramID",
-			Handler:    _UserService_GetUserByTelegramID_Handler,
+			Handler:    _JollyRogerUserService_GetUserByTelegramID_Handler,
 		},
 		{
 			MethodName: "CreateUser",
-			Handler:    _UserService_CreateUser_Handler,
+			Handler:    _JollyRogerUserService_CreateUser_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
-			Handler:    _UserService_UpdateUser_Handler,
+			Handler:    _JollyRogerUserService_UpdateUser_Handler,
 		},
 		{
 			MethodName: "AddUserPreference",
-			Handler:    _UserService_AddUserPreference_Handler,
+			Handler:    _JollyRogerUserService_AddUserPreference_Handler,
 		},
 		{
 			MethodName: "RemoveUserPreference",
-			Handler:    _UserService_RemoveUserPreference_Handler,
+			Handler:    _JollyRogerUserService_RemoveUserPreference_Handler,
 		},
 		{
 			MethodName: "GetUserPreferences",
-			Handler:    _UserService_GetUserPreferences_Handler,
+			Handler:    _JollyRogerUserService_GetUserPreferences_Handler,
 		},
 		{
 			MethodName: "UpdateUserLocation",
-			Handler:    _UserService_UpdateUserLocation_Handler,
+			Handler:    _JollyRogerUserService_UpdateUserLocation_Handler,
 		},
 		{
 			MethodName: "GetUserLocation",
-			Handler:    _UserService_GetUserLocation_Handler,
+			Handler:    _JollyRogerUserService_GetUserLocation_Handler,
 		},
 		{
 			MethodName: "FindNearbyUsers",
-			Handler:    _UserService_FindNearbyUsers_Handler,
+			Handler:    _JollyRogerUserService_FindNearbyUsers_Handler,
 		},
 		{
 			MethodName: "GetUserStats",
-			Handler:    _UserService_GetUserStats_Handler,
+			Handler:    _JollyRogerUserService_GetUserStats_Handler,
 		},
 		{
 			MethodName: "UpdateUserRating",
-			Handler:    _UserService_UpdateUserRating_Handler,
+			Handler:    _JollyRogerUserService_UpdateUserRating_Handler,
 		},
 		{
 			MethodName: "UpdateNotificationSettings",
-			Handler:    _UserService_UpdateNotificationSettings_Handler,
+			Handler:    _JollyRogerUserService_UpdateNotificationSettings_Handler,
 		},
 		{
 			MethodName: "GetNotificationSettings",
-			Handler:    _UserService_GetNotificationSettings_Handler,
+			Handler:    _JollyRogerUserService_GetNotificationSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,9 +1,9 @@
 package service
 
 import (
+	"JollyRogerUserService/internal/models"
 	"context"
 	"errors"
-	"github.com/yourusername/tg-team-finder/user-service/internal/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"time"

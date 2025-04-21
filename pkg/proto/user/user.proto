@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package user;
-option go_package = "github.com/yourusername/tg-team-finder/user-service/pkg/proto/user";
+option go_package = "JollyRogerUserService/pkg/proto/user";
 
-service UserService {
+service JollyRogerUserService {
   // Управление профилем
   rpc GetUser(GetUserRequest) returns (UserResponse);
   rpc GetUserByTelegramID(GetUserByTelegramIDRequest) returns (UserResponse);

@@ -1,8 +1,8 @@
 package postgres
 
 import (
+	"JollyRogerUserService/internal/models"
 	"errors"
-	"github.com/yourusername/tg-team-finder/user-service/internal/models"
 	"gorm.io/gorm"
 	"time"
 )
@@ -49,7 +49,7 @@ func (r *UserRepository) Create(user *models.User) error {
 
 		// Создаем настройки уведомлений по умолчанию
 		notificationSettings := models.UserNotificationSetting{
-			UserID:              user.ID,
+			UserID:               user.ID,
 			NewEventNotification: true,
 		}
 		if err := tx.Create(&notificationSettings).Error; err != nil {
@@ -125,14 +125,14 @@ func (r *UserRepository) UpdateLocation(location *models.UserLocation) error {
 	// Проверяем, существует ли уже местоположение для этого пользователя
 	var existing models.UserLocation
 	result := r.db.Where("user_id = ?", location.UserID).First(&existing)
-	
+
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// Если местоположения нет, создаем новое
 		return r.db.Create(location).Error
 	} else if result.Error != nil {
 		return result.Error
 	}
-	
+
 	// Если местоположение существует, обновляем его
 	existing.Latitude = location.Latitude
 	existing.Longitude = location.Longitude
@@ -140,7 +140,7 @@ func (r *UserRepository) UpdateLocation(location *models.UserLocation) error {
 	existing.Region = location.Region
 	existing.Country = location.Country
 	existing.UpdatedAt = time.Now()
-	
+
 	return r.db.Save(&existing).Error
 }
 
@@ -158,7 +158,7 @@ func (r *UserRepository) FindNearbyUsers(lat, lon float64, radiusKm float64, lim
 	// Для использования функций PostGIS можно использовать Raw SQL запрос
 	// Это более эффективно, чем делать расчеты внутри Go
 	var users []models.User
-	
+
 	// Запрос для поиска пользователей в заданном радиусе
 	// Используем формулу гаверсинуса для расчета расстояния на сфере
 	query := `
@@ -173,11 +173,11 @@ func (r *UserRepository) FindNearbyUsers(lat, lon float64, radiusKm float64, lim
 		) <= ?
 		LIMIT ?
 	`
-	
+
 	if err := r.db.Raw(query, lat, lon, lat, radiusKm, limit).Scan(&users).Error; err != nil {
 		return nil, err
 	}
-	
+
 	return users, nil
 }
 
@@ -201,7 +201,7 @@ func (r *UserRepository) UpdateUserRating(userID uint, ratingChange float32) err
 	if err := r.db.First(&user, userID).Error; err != nil {
 		return err
 	}
-	
+
 	user.Rating += ratingChange
 	return r.db.Save(&user).Error
 }
@@ -212,11 +212,11 @@ func (r *UserRepository) UpdateLastActive(userID uint) error {
 	if err := r.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
 		return err
 	}
-	
+
 	now := time.Now()
 	stats.LastActiveAt = &now
 	stats.UpdatedAt = now
-	
+
 	return r.db.Save(&stats).Error
 }
 
@@ -233,13 +233,13 @@ func (r *UserRepository) GetNotificationSettings(userID uint) (*models.UserNotif
 func (r *UserRepository) UpdateNotificationSettings(settings *models.UserNotificationSetting) error {
 	var existing models.UserNotificationSetting
 	result := r.db.Where("user_id = ?", settings.UserID).First(&existing)
-	
+
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return r.db.Create(settings).Error
 	} else if result.Error != nil {
 		return result.Error
 	}
-	
+
 	existing.NewEventNotification = settings.NewEventNotification
 	return r.db.Save(&existing).Error
 }

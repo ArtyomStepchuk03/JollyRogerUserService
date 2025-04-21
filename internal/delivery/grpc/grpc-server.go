@@ -1,12 +1,13 @@
 package grpc
 
 import (
+	pb "JollyRogerUserService/pkg/proto/user"
+	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"go.uber.org/zap"
 	"net"
-	pb "github.com/yourusername/tg-team-finder/user-service/pkg/proto/user"
 )
 
 // Server представляет собой gRPC сервер
@@ -60,22 +61,22 @@ func (s *Server) Stop() {
 // loggingInterceptor создает перехватчик для логирования запросов
 func (s *Server) loggingInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		s.logger.Info("gRPC request", 
+		s.logger.Info("gRPC request",
 			zap.String("method", info.FullMethod),
 			zap.Any("request", req))
-		
+
 		resp, err := handler(ctx, req)
-		
+
 		if err != nil {
-			s.logger.Error("gRPC error", 
+			s.logger.Error("gRPC error",
 				zap.String("method", info.FullMethod),
 				zap.Error(err))
 		} else {
-			s.logger.Info("gRPC response", 
+			s.logger.Info("gRPC response",
 				zap.String("method", info.FullMethod),
 				zap.Any("response", resp))
 		}
-		
+
 		return resp, err
 	}
 }
@@ -85,12 +86,12 @@ func (s *Server) recoveryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		defer func() {
 			if r := recover(); r != nil {
-				s.logger.Error("Recovered from panic", 
+				s.logger.Error("Recovered from panic",
 					zap.Any("panic", r),
 					zap.String("method", info.FullMethod))
 			}
 		}()
-		
+
 		return handler(ctx, req)
 	}
 }

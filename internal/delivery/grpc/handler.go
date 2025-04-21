@@ -1,10 +1,10 @@
 package grpc
 
 import (
+	"JollyRogerUserService/internal/models"
+	"JollyRogerUserService/internal/service"
+	pb "JollyRogerUserService/pkg/proto/user"
 	"context"
-	"github.com/yourusername/tg-team-finder/user-service/internal/models"
-	"github.com/yourusername/tg-team-finder/user-service/internal/service"
-	pb "github.com/yourusername/tg-team-finder/user-service/pkg/proto/user"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
