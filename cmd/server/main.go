@@ -60,7 +60,7 @@ func main() {
 
 	s := grpcServer.NewServer()
 	userHandler := grpc.NewUserHandler(userService, log)
-	userProto.RegisterUserServiceServer(s, userHandler)
+	userProto.RegisterJollyRogerUserServiceServer(s, userHandler)
 
 	// Включение reflection для удобства отладки (в production можно отключить)
 	reflection.Register(s)

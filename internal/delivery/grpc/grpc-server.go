@@ -43,7 +43,7 @@ func (s *Server) Run() error {
 	}
 
 	s.grpcServer = grpc.NewServer(opts...)
-	pb.RegisterUserServiceServer(s.grpcServer, s.handler)
+	pb.RegisterJollyRogerUserServiceServer(s.grpcServer, s.handler)
 
 	// Включаем reflection для удобства отладки через grpcurl
 	reflection.Register(s.grpcServer)

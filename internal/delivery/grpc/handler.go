@@ -13,7 +13,7 @@ import (
 
 // UserHandler представляет обработчик gRPC запросов
 type UserHandler struct {
-	pb.UnimplementedUserServiceServer
+	pb.UnsafeJollyRogerUserServiceServer
 	service *service.UserService
 	logger  *zap.Logger
 }
