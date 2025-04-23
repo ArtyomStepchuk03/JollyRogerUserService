@@ -25,7 +25,7 @@ func (r *UserRepository) Create(user *models.User) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Проверяем, существует ли пользователь с данным telegram_id
 		var existingUser models.User
-		result := tx.Where("telegram_id = ?", user.TelegramID).First(&existingUser)
+		result := tx.Where("telegram_id = ?", user.TelegramID).Take(&existingUser)
 		if result.Error == nil {
 			return errors.New("user with this telegram_id already exists")
 		} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -63,7 +63,7 @@ func (r *UserRepository) Create(user *models.User) error {
 // GetByID получает пользователя по ID
 func (r *UserRepository) GetByID(id uint) (*models.User, error) {
 	var user models.User
-	if err := r.db.First(&user, id).Error; err != nil {
+	if err := r.db.Take(&user, id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -72,7 +72,7 @@ func (r *UserRepository) GetByID(id uint) (*models.User, error) {
 // GetByTelegramID получает пользователя по Telegram ID
 func (r *UserRepository) GetByTelegramID(telegramID int64) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("telegram_id = ?", telegramID).First(&user).Error; err != nil {
+	if err := r.db.Where("telegram_id = ?", telegramID).Take(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -86,7 +86,7 @@ func (r *UserRepository) Update(user *models.User) error {
 // GetUserWithPreferences получает пользователя с предпочтениями
 func (r *UserRepository) GetUserWithPreferences(userID uint) (*models.User, error) {
 	var user models.User
-	if err := r.db.Preload("Preferences").First(&user, userID).Error; err != nil {
+	if err := r.db.Preload("Preferences").Take(&user, userID).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -96,7 +96,7 @@ func (r *UserRepository) GetUserWithPreferences(userID uint) (*models.User, erro
 func (r *UserRepository) AddPreference(userPreference *models.UserPreference) error {
 	// Проверяем, существует ли уже такое предпочтение
 	var existing models.UserPreference
-	result := r.db.Where("user_id = ? AND tag_id = ?", userPreference.UserID, userPreference.TagID).First(&existing)
+	result := r.db.Where("user_id = ? AND tag_id = ?", userPreference.UserID, userPreference.TagID).Take(&existing)
 	if result.Error == nil {
 		return errors.New("preference already exists")
 	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -124,7 +124,7 @@ func (r *UserRepository) GetPreferences(userID uint) ([]models.UserPreference, e
 func (r *UserRepository) UpdateLocation(location *models.UserLocation) error {
 	// Проверяем, существует ли уже местоположение для этого пользователя
 	var existing models.UserLocation
-	result := r.db.Where("user_id = ?", location.UserID).First(&existing)
+	result := r.db.Where("user_id = ?", location.UserID).Take(&existing)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// Если местоположения нет, создаем новое
@@ -147,7 +147,7 @@ func (r *UserRepository) UpdateLocation(location *models.UserLocation) error {
 // GetLocation получает местоположение пользователя
 func (r *UserRepository) GetLocation(userID uint) (*models.UserLocation, error) {
 	var location models.UserLocation
-	if err := r.db.Where("user_id = ?", userID).First(&location).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Take(&location).Error; err != nil {
 		return nil, err
 	}
 	return &location, nil
@@ -184,7 +184,7 @@ func (r *UserRepository) FindNearbyUsers(lat, lon float64, radiusKm float64, lim
 // GetStats получает статистику пользователя
 func (r *UserRepository) GetStats(userID uint) (*models.UserStats, error) {
 	var stats models.UserStats
-	if err := r.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Take(&stats).Error; err != nil {
 		return nil, err
 	}
 	return &stats, nil
@@ -198,7 +198,7 @@ func (r *UserRepository) UpdateStats(stats *models.UserStats) error {
 // UpdateUserRating обновляет рейтинг пользователя
 func (r *UserRepository) UpdateUserRating(userID uint, ratingChange float32) error {
 	var user models.User
-	if err := r.db.First(&user, userID).Error; err != nil {
+	if err := r.db.Take(&user, userID).Error; err != nil {
 		return err
 	}
 
@@ -209,7 +209,7 @@ func (r *UserRepository) UpdateUserRating(userID uint, ratingChange float32) err
 // UpdateLastActive обновляет время последней активности пользователя
 func (r *UserRepository) UpdateLastActive(userID uint) error {
 	var stats models.UserStats
-	if err := r.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Take(&stats).Error; err != nil {
 		return err
 	}
 
@@ -223,7 +223,7 @@ func (r *UserRepository) UpdateLastActive(userID uint) error {
 // GetNotificationSettings получает настройки уведомлений пользователя
 func (r *UserRepository) GetNotificationSettings(userID uint) (*models.UserNotificationSetting, error) {
 	var settings models.UserNotificationSetting
-	if err := r.db.Where("user_id = ?", userID).First(&settings).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Take(&settings).Error; err != nil {
 		return nil, err
 	}
 	return &settings, nil
@@ -232,7 +232,7 @@ func (r *UserRepository) GetNotificationSettings(userID uint) (*models.UserNotif
 // UpdateNotificationSettings обновляет настройки уведомлений пользователя
 func (r *UserRepository) UpdateNotificationSettings(settings *models.UserNotificationSetting) error {
 	var existing models.UserNotificationSetting
-	result := r.db.Where("user_id = ?", settings.UserID).First(&existing)
+	result := r.db.Where("user_id = ?", settings.UserID).Take(&existing)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return r.db.Create(settings).Error

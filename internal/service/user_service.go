@@ -9,6 +9,24 @@ import (
 	"time"
 )
 
+// UserServiceInterface определяет интерфейс для сервиса пользователей
+type UserServiceInterface interface {
+	CreateUser(ctx context.Context, req *models.CreateUserRequest) (*models.User, error)
+	GetUser(ctx context.Context, id uint) (*models.User, error)
+	GetUserByTelegramID(ctx context.Context, telegramID int64) (*models.User, error)
+	UpdateUser(ctx context.Context, id uint, username, bio string) (*models.User, error)
+	AddUserPreference(ctx context.Context, userID, tagID uint) error
+	RemoveUserPreference(ctx context.Context, userID, tagID uint) error
+	GetUserPreferences(ctx context.Context, userID uint) ([]models.UserPreference, error)
+	UpdateUserLocation(ctx context.Context, req *models.UserLocationRequest) error
+	GetUserLocation(ctx context.Context, userID uint) (*models.UserLocation, error)
+	FindNearbyUsers(ctx context.Context, lat, lon float64, radiusKm float64, limit int) ([]models.User, error)
+	GetUserStats(ctx context.Context, userID uint) (*models.UserStats, error)
+	UpdateUserRating(ctx context.Context, userID uint, ratingChange float32) (*models.User, error)
+	GetNotificationSettings(ctx context.Context, userID uint) (*models.UserNotificationSetting, error)
+	UpdateNotificationSettings(ctx context.Context, req *models.UpdateNotificationSettingRequest) error
+}
+
 // UserRepositoryInterface описывает интерфейс для работы с репозиторием пользователей
 type UserRepositoryInterface interface {
 	Create(user *models.User) error

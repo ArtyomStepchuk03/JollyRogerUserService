@@ -14,12 +14,12 @@ import (
 // UserHandler представляет обработчик gRPC запросов
 type UserHandler struct {
 	pb.UnsafeJollyRogerUserServiceServer
-	service *service.UserService
+	service service.UserServiceInterface
 	logger  *zap.Logger
 }
 
 // NewUserHandler создает новый экземпляр UserHandler
-func NewUserHandler(service *service.UserService, logger *zap.Logger) *UserHandler {
+func NewUserHandler(service service.UserServiceInterface, logger *zap.Logger) *UserHandler {
 	return &UserHandler{
 		service: service,
 		logger:  logger,

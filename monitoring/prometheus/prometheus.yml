@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+# - "alerts.yml"
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "user-service"
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["userservice:50053"]  # Предполагая, что HEALTH_PORT=50052, а metrics порт = HEALTH_PORT + 1
+
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:9187"]
+
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis:9121"]
