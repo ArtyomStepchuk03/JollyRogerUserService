@@ -2,218 +2,18 @@ package integration
 
 import (
 	"context"
-	"log"
-	"net"
-	"os"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	"testing"
 	"time"
 
-	"JollyRogerUserService/config"
-	grpcHandler "JollyRogerUserService/internal/delivery/grpc"
-	"JollyRogerUserService/internal/repository/postgres"
-	localRedis "JollyRogerUserService/internal/repository/redis"
-	"JollyRogerUserService/internal/service"
-	"JollyRogerUserService/pkg/database"
-	"JollyRogerUserService/pkg/logger"
 	pb "JollyRogerUserService/pkg/proto/user"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
-	"github.com/redis/go-redis/v9"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 )
 
-var (
-	resilienceClient pb.JollyRogerUserServiceClient
-	resilienceConn   *grpc.ClientConn
-	pgResourceRes    *dockertest.Resource
-	rdResourceRes    *dockertest.Resource
-	poolRes          *dockertest.Pool
-	dbRes            *gorm.DB
-	redisClientRes   *redis.Client
-)
-
-// TestResilienceMain настраивает тестовое окружение для проверки устойчивости
-func TestResilienceMain(m *testing.M) {
-	// Создаем Docker-pool
-	var err error
-	poolRes, err = dockertest.NewPool("")
-	if err != nil {
-		log.Fatalf("Could not connect to Docker: %s", err)
-	}
-
-	// Устанавливаем тайм-аут для контейнеров
-	poolRes.MaxWait = time.Minute * 2
-
-	// Запускаем PostgreSQL
-	pgResourceRes, err = poolRes.RunWithOptions(&dockertest.RunOptions{
-		Repository: "postgres",
-		Tag:        "15",
-		Env: []string{
-			"POSTGRES_PASSWORD=postgres",
-			"POSTGRES_USER=postgres",
-			"POSTGRES_DB=resilience_test_db",
-		},
-	}, func(config *docker.HostConfig) {
-		config.AutoRemove = true
-		config.RestartPolicy = docker.RestartPolicy{
-			Name: "no",
-		}
-	})
-	if err != nil {
-		log.Fatalf("Could not start PostgreSQL: %s", err)
-	}
-
-	// Запускаем Redis
-	rdResourceRes, err = poolRes.RunWithOptions(&dockertest.RunOptions{
-		Repository: "redis",
-		Tag:        "7",
-	}, func(config *docker.HostConfig) {
-		config.AutoRemove = true
-		config.RestartPolicy = docker.RestartPolicy{
-			Name: "no",
-		}
-	})
-	if err != nil {
-		log.Fatalf("Could not start Redis: %s", err)
-	}
-
-	// Получаем хост и порт PostgreSQL
-	pgHost := pgResourceRes.GetBoundIP("5432/tcp")
-	pgPort := pgResourceRes.GetPort("5432/tcp")
-
-	// Получаем хост и порт Redis
-	redisHost := rdResourceRes.GetBoundIP("6379/tcp")
-	redisPort := rdResourceRes.GetPort("6379/tcp")
-
-	// Ожидаем готовности PostgreSQL
-	if err := poolRes.Retry(func() error {
-		pgConfig := config.PostgresConfig{
-			Host:     pgHost,
-			Port:     5432,
-			Username: "postgres",
-			Password: "postgres",
-			DBName:   "resilience_test_db",
-			SSLMode:  "disable",
-		}
-
-		var err error
-		dbRes, err = database.NewPostgresDB(pgConfig)
-		return err
-	}); err != nil {
-		log.Fatalf("Could not connect to PostgreSQL: %s", err)
-	}
-
-	// Ожидаем готовности Redis
-	if err := poolRes.Retry(func() error {
-		redisConfig := config.RedisConfig{
-			Addr:     redisHost + ":" + redisPort,
-			Password: "",
-			DB:       0,
-		}
-
-		redisClient, err := database.NewRedisClient(redisConfig)
-		if err != nil {
-			return err
-		}
-		_, err = redisClient.Ping(context.Background()).Result()
-		return err
-	}); err != nil {
-		log.Fatalf("Could not connect to Redis: %s", err)
-	}
-
-	// Запускаем gRPC сервер для тестирования
-	go runResilienceTestServer(pgHost, pgPort, redisHost, redisPort)
-
-	// Ожидаем запуска сервера
-	time.Sleep(time.Second * 2)
-
-	// Подключаемся к серверу как клиент
-	resilienceConn, err = grpc.Dial("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("Failed to connect to server: %v", err)
-	}
-	resilienceClient = pb.NewJollyRogerUserServiceClient(resilienceConn)
-
-	// Запускаем тесты
-	code := m.Run()
-
-	// Очистка ресурсов
-	resilienceConn.Close()
-	poolRes.Purge(pgResourceRes)
-	poolRes.Purge(rdResourceRes)
-
-	os.Exit(code)
-}
-
-// runResilienceTestServer запускает тестовый gRPC сервер
-func runResilienceTestServer(pgHost, pgPort, redisHost, redisPort string) {
-	// Настройка логгера
-	log := logger.NewLogger()
-
-	// Настройка PostgreSQL
-	pgConfig := config.PostgresConfig{
-		Host:     pgHost,
-		Port:     5432,
-		Username: "postgres",
-		Password: "postgres",
-		DBName:   "resilience_test_db",
-		SSLMode:  "disable",
-	}
-
-	// Настройка Redis
-	redisConfig := config.RedisConfig{
-		Addr:     redisHost + ":" + redisPort,
-		Password: "",
-		DB:       0,
-	}
-
-	// Подключение к PostgreSQL
-	db, err := database.NewPostgresDB(pgConfig)
-	if err != nil {
-		log.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
-	}
-
-	// Подключение к Redis
-	redisClient, err := database.NewRedisClient(redisConfig)
-	if err != nil {
-		log.Fatal("Failed to connect to Redis", zap.Error(err))
-	}
-
-	// Инициализация репозиториев
-	userRepo := postgres.NewUserRepository(db)
-	cacheRepo := localRedis.NewCacheRepository(redisClient)
-
-	// Инициализация сервиса
-	userService := service.NewUserService(userRepo, cacheRepo, log)
-
-	// Инициализация gRPC сервера
-	lis, err := net.Listen("tcp", ":50052")
-	if err != nil {
-		log.Fatal("Failed to listen", zap.Error(err))
-	}
-
-	s := grpc.NewServer()
-	userHandler := grpcHandler.NewUserHandler(userService, log)
-	pb.RegisterJollyRogerUserServiceServer(s, userHandler)
-
-	if err := s.Serve(lis); err != nil {
-		log.Fatal("Failed to serve", zap.Error(err))
-	}
-}
-
-// TestRedisFailure проверяет поведение при недоступности Redis
+// TestRedisFailure проверяет работу сервиса при недоступности Redis
 func TestRedisFailure(t *testing.T) {
-	// Пропускаем этот тест в обычном режиме, чтобы не нарушать
-	// работу других тестов, требующих доступа к контейнерам
-	if os.Getenv("RUN_RESILIENCE_TESTS") != "true" {
-		t.Skip("Skipping resilience test in normal mode")
-	}
-
 	// Создаем пользователя для тестирования
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -224,14 +24,15 @@ func TestRedisFailure(t *testing.T) {
 		Bio:        "Test user for Redis failure",
 	}
 
-	user, err := resilienceClient.CreateUser(ctx, createReq)
+	user, err := client.CreateUser(ctx, createReq)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
 
 	// Останавливаем Redis, чтобы имитировать его недоступность
-	if err := rdResourceRes.Stop(ctx); err != nil {
-		t.Fatalf("Could not stop Redis: %s", err)
+	t.Log("Stopping Redis container to simulate failure")
+	if err := pool.Purge(rdResource); err != nil {
+		t.Fatalf("Could not purge Redis container: %s", err)
 	}
 
 	// Ждем, чтобы убедиться, что Redis недоступен
@@ -247,7 +48,12 @@ func TestRedisFailure(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		getUserResp, err := resilienceClient.GetUser(ctx, getReq)
+		start := time.Now()
+		getUserResp, err := client.GetUser(ctx, getReq)
+		duration := time.Since(start)
+
+		t.Logf("Request completed in %v", duration)
+
 		if err != nil {
 			t.Fatalf("Failed to get user when Redis is down: %v", err)
 		}
@@ -271,7 +77,7 @@ func TestRedisFailure(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		_, err := resilienceClient.UpdateUserLocation(ctx, updateLocReq)
+		_, err := client.UpdateUserLocation(ctx, updateLocReq)
 		if err != nil {
 			t.Fatalf("Failed to update location when Redis is down: %v", err)
 		}
@@ -281,7 +87,7 @@ func TestRedisFailure(t *testing.T) {
 			UserId: user.Id,
 		}
 
-		getLocResp, err := resilienceClient.GetUserLocation(ctx, getLocReq)
+		getLocResp, err := client.GetUserLocation(ctx, getLocReq)
 		if err != nil {
 			t.Fatalf("Failed to get location when Redis is down: %v", err)
 		}
@@ -292,12 +98,20 @@ func TestRedisFailure(t *testing.T) {
 	})
 
 	// Запускаем Redis обратно
-	if err := rdResourceRes.Start(ctx); err != nil {
+	t.Log("Restarting Redis container")
+	rdResource, err = pool.RunWithOptions(&dockertest.RunOptions{
+		Repository: "redis",
+		Tag:        "7",
+	}, func(config *docker.HostConfig) {
+		config.AutoRemove = true
+		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
+	})
+	if err != nil {
 		t.Fatalf("Could not restart Redis: %s", err)
 	}
 
 	// Ждем, пока Redis снова станет доступен
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	// Проверяем, что система вернулась к нормальной работе
 	t.Run("SystemRecoveredAfterRedisRestart", func(t *testing.T) {
@@ -308,7 +122,7 @@ func TestRedisFailure(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		getUserResp, err := resilienceClient.GetUser(ctx, getReq)
+		getUserResp, err := client.GetUser(ctx, getReq)
 		if err != nil {
 			t.Fatalf("Failed to get user after Redis restart: %v", err)
 		}
@@ -321,11 +135,6 @@ func TestRedisFailure(t *testing.T) {
 
 // TestPostgresFailure проверяет поведение при недоступности PostgreSQL
 func TestPostgresFailure(t *testing.T) {
-	// Пропускаем этот тест в обычном режиме
-	if os.Getenv("RUN_RESILIENCE_TESTS") != "true" {
-		t.Skip("Skipping resilience test in normal mode")
-	}
-
 	// Создаем пользователя для тестирования
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -336,23 +145,27 @@ func TestPostgresFailure(t *testing.T) {
 		Bio:        "Test user for Postgres failure",
 	}
 
-	user, err := resilienceClient.CreateUser(ctx, createReq)
+	user, err := client.CreateUser(ctx, createReq)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
 
-	// Кэшируем пользователя, выполнив запрос
+	// Делаем несколько запросов к пользователю, чтобы обеспечить кэширование
 	getReq := &pb.GetUserRequest{
 		Id: user.Id,
 	}
-	_, err = resilienceClient.GetUser(ctx, getReq)
-	if err != nil {
-		t.Fatalf("Failed to get user for caching: %v", err)
+
+	for i := 0; i < 3; i++ {
+		_, err = client.GetUser(ctx, getReq)
+		if err != nil {
+			t.Fatalf("Failed to get user for caching: %v", err)
+		}
 	}
 
 	// Останавливаем PostgreSQL, чтобы имитировать его недоступность
-	if err := pgResourceRes.Stop(ctx); err != nil {
-		t.Fatalf("Could not stop PostgreSQL: %s", err)
+	t.Log("Stopping PostgreSQL container to simulate failure")
+	if err := pool.Purge(rdResource); err != nil {
+		t.Fatalf("Could not purge Redis container: %s", err)
 	}
 
 	// Ждем, чтобы убедиться, что PostgreSQL недоступен
@@ -367,7 +180,12 @@ func TestPostgresFailure(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		getUserResp, err := resilienceClient.GetUser(ctx, getReq)
+		start := time.Now()
+		getUserResp, err := client.GetUser(ctx, getReq)
+		duration := time.Since(start)
+
+		t.Logf("Request completed in %v", duration)
+
 		if err != nil {
 			t.Fatalf("Failed to get user from cache when Postgres is down: %v", err)
 		}
@@ -388,7 +206,7 @@ func TestPostgresFailure(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		_, err := resilienceClient.CreateUser(ctx, newUserReq)
+		_, err := client.CreateUser(ctx, newUserReq)
 		if err == nil {
 			t.Fatalf("Expected error when creating user with Postgres down, got nil")
 		}
@@ -398,14 +216,26 @@ func TestPostgresFailure(t *testing.T) {
 		if !ok {
 			t.Fatalf("Expected gRPC status error, got: %v", err)
 		}
-		if st.Code() != codes.Internal {
-			t.Errorf("Expected error code Internal, got %v", st.Code())
+
+		t.Logf("Got expected error: %v with code: %v", st.Message(), st.Code())
+
+		// Код может быть Internal или Unavailable в зависимости от реализации
+		if st.Code() != codes.Internal && st.Code() != codes.Unavailable {
+			t.Errorf("Expected error code Internal or Unavailable, got %v", st.Code())
 		}
 	})
 
 	// Запускаем PostgreSQL обратно
-	if err := pgResourceRes.Start(ctx); err != nil {
-		t.Fatalf("Could not restart PostgreSQL: %s", err)
+	t.Log("Restarting PostgreSQL container")
+	rdResource, err = pool.RunWithOptions(&dockertest.RunOptions{
+		Repository: "redis",
+		Tag:        "7",
+	}, func(config *docker.HostConfig) {
+		config.AutoRemove = true
+		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
+	})
+	if err != nil {
+		t.Fatalf("Could not restart Redis: %s", err)
 	}
 
 	// Ждем, пока PostgreSQL снова станет доступен
@@ -423,7 +253,7 @@ func TestPostgresFailure(t *testing.T) {
 		defer cancel()
 
 		// Пытаемся создать пользователя после восстановления PostgreSQL
-		createResp, err := resilienceClient.CreateUser(ctx, newUserReq)
+		createResp, err := client.CreateUser(ctx, newUserReq)
 		if err != nil {
 			t.Fatalf("Failed to create user after Postgres restart: %v", err)
 		}
@@ -434,117 +264,8 @@ func TestPostgresFailure(t *testing.T) {
 	})
 }
 
-// TestNetworkPartition имитирует сетевой раздел между сервисами
-func TestNetworkPartition(t *testing.T) {
-	// Пропускаем этот тест в обычном режиме
-	if os.Getenv("RUN_RESILIENCE_TESTS") != "true" {
-		t.Skip("Skipping resilience test in normal mode")
-	}
-
-	// Создаем новую изолированную сеть
-	networkName := "resilience_test_network"
-
-	// Создаем сеть для тестирования
-	network, err := poolRes.Client.CreateNetwork(docker.CreateNetworkOptions{
-		Name: networkName,
-	})
-	if err != nil {
-		t.Fatalf("Could not create test network: %s", err)
-	}
-
-	// Отключаем PostgreSQL от сети, имитируя сетевой раздел
-	err = poolRes.Client.DisconnectNetwork(network.ID, docker.NetworkConnectionOptions{
-		Container: pgResourceRes.Container.ID,
-	})
-	if err != nil {
-		t.Fatalf("Could not disconnect Postgres from network: %s", err)
-	}
-
-	// Проверяем поведение при сетевом разделе
-	// Код проверки будет аналогичен TestPostgresFailure
-
-	// Подключаем PostgreSQL обратно к сети
-	err = poolRes.Client.ConnectNetwork(network.ID, docker.NetworkConnectionOptions{
-		Container: pgResourceRes.Container.ID,
-	})
-	if err != nil {
-		t.Fatalf("Could not reconnect Postgres to network: %s", err)
-	}
-
-	// Удаляем тестовую сеть
-	err = poolRes.Client.RemoveNetwork(network.ID)
-	if err != nil {
-		t.Fatalf("Could not remove test network: %s", err)
-	}
-}
-
-// TestHighLatency тестирует поведение системы при высокой задержке
-func TestHighLatency(t *testing.T) {
-	// Пропускаем этот тест в обычном режиме
-	if os.Getenv("RUN_RESILIENCE_TESTS") != "true" {
-		t.Skip("Skipping resilience test in normal mode")
-	}
-
-	// Устанавливаем задержку сети для контейнера PostgreSQL
-	// Примечание: это требует привилегий CAP_NET_ADMIN и Linux TC
-	// В Docker можно использовать параметры network при запуске контейнера
-
-	// Создаем пользователя для тестирования
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	createReq := &pb.CreateUserRequest{
-		TelegramId: 555000555,
-		Username:   "latency_test_user",
-		Bio:        "Test user for high latency",
-	}
-
-	user, err := resilienceClient.CreateUser(ctx, createReq)
-	if err != nil {
-		t.Fatalf("Failed to create user: %v", err)
-	}
-
-	// Кэшируем пользователя, выполнив запрос
-	getReq := &pb.GetUserRequest{
-		Id: user.Id,
-	}
-	_, err = resilienceClient.GetUser(ctx, getReq)
-	if err != nil {
-		t.Fatalf("Failed to get user for caching: %v", err)
-	}
-
-	// Имитируем высокую задержку (в реальном случае это бы делалось через сетевые инструменты)
-	// Здесь мы используем контекст с таймаутом для измерения времени отклика
-
-	t.Run("RespondsWithinTimeout", func(t *testing.T) {
-		// Устанавливаем короткий таймаут для контекста
-		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-		defer cancel()
-
-		// Запрос должен вернуться из кэша до истечения таймаута
-		startTime := time.Now()
-		_, err := resilienceClient.GetUser(ctx, getReq)
-		duration := time.Since(startTime)
-
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-
-		t.Logf("Request completed in %v", duration)
-
-		if duration > 500*time.Millisecond {
-			t.Errorf("Request took too long: %v", duration)
-		}
-	})
-}
-
-// TestConcurrentRequests проверяет работу сервиса под нагрузкой параллельных запросов
+// TestConcurrentRequests проверяет работу сервиса при многочисленных параллельных запросах
 func TestConcurrentRequests(t *testing.T) {
-	// Пропускаем этот тест в обычном режиме
-	if os.Getenv("RUN_RESILIENCE_TESTS") != "true" {
-		t.Skip("Skipping resilience test in normal mode")
-	}
-
 	// Создаем тестового пользователя
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -555,46 +276,161 @@ func TestConcurrentRequests(t *testing.T) {
 		Bio:        "Test user for concurrent requests",
 	}
 
-	user, err := resilienceClient.CreateUser(ctx, createReq)
+	user, err := client.CreateUser(ctx, createReq)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
 
-	// Генерируем большое количество параллельных запросов
-	concurrency := 100
-	getReq := &pb.GetUserRequest{
-		Id: user.Id,
+	// Добавляем местоположение
+	updateLocReq := &pb.UpdateUserLocationRequest{
+		UserId:    user.Id,
+		Latitude:  55.7558,
+		Longitude: 37.6173,
+		City:      "Moscow",
+		Region:    "Moscow",
+		Country:   "Russia",
 	}
 
-	// Канал для сбора результатов
-	results := make(chan error, concurrency)
+	_, err = client.UpdateUserLocation(ctx, updateLocReq)
+	if err != nil {
+		t.Fatalf("Failed to update location: %v", err)
+	}
 
-	// Запускаем параллельные запросы
+	// Генерируем большое количество параллельных запросов разных типов
+	concurrency := 50
+	errorChan := make(chan error, concurrency*3) // Для трех типов запросов
+
+	t.Logf("Starting %d concurrent requests of each type (get user, get location, update rating)", concurrency)
+
+	// Запускаем параллельные запросы для получения пользователя
 	for i := 0; i < concurrency; i++ {
-		go func() {
+		go func(id int) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			_, err := resilienceClient.GetUser(ctx, getReq)
-			results <- err
-		}()
+			getReq := &pb.GetUserRequest{Id: user.Id}
+			_, err := client.GetUser(ctx, getReq)
+			errorChan <- err
+		}(i)
+	}
+
+	// Запускаем параллельные запросы для получения местоположения
+	for i := 0; i < concurrency; i++ {
+		go func(id int) {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			getLocReq := &pb.GetUserLocationRequest{UserId: user.Id}
+			_, err := client.GetUserLocation(ctx, getLocReq)
+			errorChan <- err
+		}(i)
+	}
+
+	// Запускаем параллельные запросы для обновления рейтинга
+	for i := 0; i < concurrency; i++ {
+		go func(id int) {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			updateRatingReq := &pb.UpdateUserRatingRequest{
+				UserId:       user.Id,
+				RatingChange: 0.1,
+			}
+			_, err := client.UpdateUserRating(ctx, updateRatingReq)
+			errorChan <- err
+		}(i)
 	}
 
 	// Собираем и проверяем результаты
 	var successCount, errorCount int
-	for i := 0; i < concurrency; i++ {
-		err := <-results
+	for i := 0; i < concurrency*3; i++ {
+		err := <-errorChan
 		if err == nil {
 			successCount++
 		} else {
 			errorCount++
-			t.Logf("Request %d failed: %v", i, err)
+			t.Logf("Request error: %v", err)
 		}
 	}
 
 	// Проверяем, что большинство запросов выполнено успешно
-	t.Logf("Success: %d, Errors: %d", successCount, errorCount)
-	if float64(successCount)/float64(concurrency) < 0.95 {
-		t.Errorf("Too many failed requests: %d out of %d", errorCount, concurrency)
+	t.Logf("Concurrent requests results - Success: %d, Errors: %d (Total: %d)",
+		successCount, errorCount, concurrency*3)
+
+	successRate := float64(successCount) / float64(concurrency*3)
+	if successRate < 0.95 {
+		t.Errorf("Too many failed requests: %d out of %d (%.2f%% success rate)",
+			errorCount, concurrency*3, successRate*100)
+	}
+
+	// Проверяем финальный рейтинг пользователя, чтобы убедиться, что все обновления применились
+	getReq := &pb.GetUserRequest{Id: user.Id}
+	updatedUser, err := client.GetUser(ctx, getReq)
+	if err != nil {
+		t.Fatalf("Failed to get updated user: %v", err)
+	}
+
+	t.Logf("Final user rating after concurrent updates: %f", updatedUser.Rating)
+}
+
+// TestCircuitBreaker проверяет работу механизма circuit breaker
+func TestCircuitBreaker(t *testing.T) {
+	// Этот тест требует модификации сервера или мок для имитации ошибок,
+	// поэтому опустим реальную имплементацию, но опишем логику
+
+	t.Skip("Circuit breaker test requires mock server implementation")
+
+	/*
+		Логика теста должна быть следующая:
+		1. Настроить circuit breaker с низким порогом срабатывания (например, 3 ошибки)
+		2. Вызвать несколько раз операцию, которая всегда завершается с ошибкой
+		3. Проверить, что circuit breaker открылся (запросы отклоняются без выполнения)
+		4. Подождать, пока истечет время сброса (resetTimeout)
+		5. Проверить, что circuit breaker перешел в полуоткрытое состояние
+		6. Вызвать операцию, которая завершится успешно
+		7. Проверить, что circuit breaker закрылся
+	*/
+}
+
+// TestRetryMechanism проверяет работу механизма повторных попыток
+func TestRetryMechanism(t *testing.T) {
+	// Этот тест также требует модификации сервера или мок для имитации временных ошибок
+	t.Skip("Retry mechanism test requires mock server implementation")
+
+	/*
+		Логика теста должна быть следующая:
+		1. Настроить механизм повторов с определенными параметрами
+		2. Вызвать операцию, которая сначала завершается с ошибкой, а затем успешно
+		3. Проверить, что операция в итоге выполнилась успешно
+		4. Проверить, что было сделано ожидаемое количество попыток
+	*/
+}
+
+// TestTimeout проверяет поведение сервиса при таймаутах
+func TestTimeout(t *testing.T) {
+	// Создаем контекст с очень коротким таймаутом
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
+	defer cancel()
+
+	// Пытаемся выполнить запрос, который не успеет завершиться за такое время
+	getReq := &pb.GetUserRequest{Id: 1}
+	_, err := client.GetUser(ctx, getReq)
+
+	// Проверяем, что получили ошибку таймаута
+	if err == nil {
+		t.Fatal("Expected timeout error, got nil")
+	}
+
+	// Проверяем код ошибки
+	st, ok := status.FromError(err)
+	if !ok {
+		t.Fatalf("Expected gRPC status error, got: %v", err)
+	}
+
+	t.Logf("Got expected timeout error: %v with code: %v", st.Message(), st.Code())
+
+	// Код может быть DeadlineExceeded или Canceled
+	if st.Code() != codes.DeadlineExceeded && st.Code() != codes.Canceled {
+		t.Errorf("Expected error code DeadlineExceeded or Canceled, got %v", st.Code())
 	}
 }

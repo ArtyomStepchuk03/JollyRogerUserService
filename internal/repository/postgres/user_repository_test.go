@@ -215,8 +215,8 @@ func TestGetByTelegramIDNotFound(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "telegram_id", "username", "bio", "rating"})
 	// Пустой результат - пользователь не найден
 
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE telegram_id = $1 LIMIT 1`)).
-		WithArgs(telegramID).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE telegram_id = $1 LIMIT $2`)).
+		WithArgs(telegramID, 1).
 		WillReturnRows(rows)
 
 	// Выполняем тестируемый метод

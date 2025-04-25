@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -224,7 +225,13 @@ func TestResilientUserRepository_GetByID(t *testing.T) {
 	t.Run("UserNotFound", func(t *testing.T) {
 		nonExistentID := uint(999)
 
-		// Настраиваем ожидаемое поведение SQL-мока
+		// Настраиваем ожидаемое поведение SQL-мока для ПЕРВОГО запроса
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE "users"."id" = $1 LIMIT $2`)).
+			WithArgs(nonExistentID, 1).
+			WillReturnError(gorm.ErrRecordNotFound)
+
+		// Настраиваем ожидаемое поведение SQL-мока для ПОВТОРНОЙ попытки
+		// ResilientUserRepository может попытаться выполнить повторный запрос при ошибке
 		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE "users"."id" = $1 LIMIT $2`)).
 			WithArgs(nonExistentID, 1).
 			WillReturnError(gorm.ErrRecordNotFound)
@@ -233,10 +240,6 @@ func TestResilientUserRepository_GetByID(t *testing.T) {
 		_, err := repo.GetByID(nonExistentID)
 
 		// Проверяем, что была возвращена ошибка о ненайденной записи
-		if err == nil {
-			t.Fatal("Expected error for non-existent user, got nil")
-		}
-
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
 		}
@@ -288,10 +291,10 @@ func TestResilientUserRepository_UpdateUserRating(t *testing.T) {
 			WithArgs(userID, 1).
 			WillReturnRows(rows)
 
-		// Обновление рейтинга
+		// Обновление рейтинга - GORM обновляет все поля пользователя
 		mock.ExpectBegin()
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "users" SET "telegram_id"=$1,"username"=$2,"bio"=$3,"rating"=$4 WHERE "id" = $5`)).
-			WithArgs(initialRating+ratingChange, userID).
+			WithArgs(int64(123456789), "testuser", "Test bio", initialRating+ratingChange, userID).
 			WillReturnResult(sqlmock.NewResult(0, 1))
 		mock.ExpectCommit()
 
@@ -381,7 +384,7 @@ func TestResilientUserRepository_UpdateUserRating(t *testing.T) {
 		// Симулируем ошибку при обновлении рейтинга
 		mock.ExpectBegin()
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "users" SET "telegram_id"=$1,"username"=$2,"bio"=$3,"rating"=$4 WHERE "id" = $5`)).
-			WithArgs(initialRating+ratingChange, userID).
+			WithArgs(int64(123456789), "testuser", "Test bio", initialRating+ratingChange, userID).
 			WillReturnError(errors.New("database update error"))
 		mock.ExpectRollback()
 
@@ -433,13 +436,34 @@ func TestResilientUserRepository_FindNearbyUsers(t *testing.T) {
 
 	// Тест: Успешный поиск пользователей
 	t.Run("SuccessfulFind", func(t *testing.T) {
+		// Очищаем оставшиеся ожидания
+		mock.ExpectationsWereMet()
+
 		// Настраиваем ожидаемое поведение SQL-мока
 		rows := sqlmock.NewRows([]string{"id", "telegram_id", "username", "bio", "rating"}).
 			AddRow(1, 123456789, "user1", "Bio 1", 4.5).
 			AddRow(2, 987654321, "user2", "Bio 2", 3.7)
 
-		// Запрос для поиска пользователей рядом
-		mock.ExpectQuery(`SELECT u\.\* FROM users u JOIN user_locations l ON u\.id = l\.user_id WHERE \(.*\) <= \? LIMIT \?`).
+		// Важно: используем ТОЧНОЕ соответствие SQL запроса, который фактически выполняется
+		// Это запрос, который генерируется в файле user_repository.go в методе FindNearbyUsers
+		expectedSQL := `
+            SELECT u.* FROM users u
+            JOIN user_locations l ON u.id = l.user_id
+            WHERE (
+                6371 * acos(
+                    cos(radians($1)) * cos(radians(l.latitude)) * 
+                    cos(radians(l.longitude) - radians($2)) + 
+                    sin(radians($3)) * sin(radians(l.latitude))
+                )
+            ) <= $4
+            LIMIT $5
+        `
+		// Убираем лишние пробелы и переводы строк
+		expectedSQL = strings.ReplaceAll(expectedSQL, "\n", " ")
+		expectedSQL = regexp.MustCompile(`\s+`).ReplaceAllString(expectedSQL, " ")
+		expectedSQL = strings.TrimSpace(expectedSQL)
+
+		mock.ExpectQuery(regexp.QuoteMeta(expectedSQL)).
 			WithArgs(lat, lon, lat, radiusKm, limit).
 			WillReturnRows(rows)
 
@@ -467,11 +491,31 @@ func TestResilientUserRepository_FindNearbyUsers(t *testing.T) {
 
 	// Тест: Отсутствие пользователей рядом
 	t.Run("NoNearbyUsers", func(t *testing.T) {
+		// Очищаем оставшиеся ожидания
+		mock.ExpectationsWereMet()
+
 		// Настраиваем ожидаемое поведение SQL-мока - пустой результат
 		rows := sqlmock.NewRows([]string{"id", "telegram_id", "username", "bio", "rating"})
 
-		// Запрос для поиска пользователей рядом
-		mock.ExpectQuery(`SELECT * FROM users u JOIN user_locations l ON u\.id = l\.user_id WHERE \(.*\) <= \? LIMIT \?`).
+		// Используем тот же точный SQL запрос
+		expectedSQL := `
+            SELECT u.* FROM users u
+            JOIN user_locations l ON u.id = l.user_id
+            WHERE (
+                6371 * acos(
+                    cos(radians($1)) * cos(radians(l.latitude)) * 
+                    cos(radians(l.longitude) - radians($2)) + 
+                    sin(radians($3)) * sin(radians(l.latitude))
+                )
+            ) <= $4
+            LIMIT $5
+        `
+		// Убираем лишние пробелы и переводы строк
+		expectedSQL = strings.ReplaceAll(expectedSQL, "\n", " ")
+		expectedSQL = regexp.MustCompile(`\s+`).ReplaceAllString(expectedSQL, " ")
+		expectedSQL = strings.TrimSpace(expectedSQL)
+
+		mock.ExpectQuery(regexp.QuoteMeta(expectedSQL)).
 			WithArgs(lat, lon, lat, radiusKm, limit).
 			WillReturnRows(rows)
 
@@ -494,8 +538,29 @@ func TestResilientUserRepository_FindNearbyUsers(t *testing.T) {
 
 	// Тест: Обработка ошибки при поиске
 	t.Run("ErrorHandling", func(t *testing.T) {
+		// Очищаем оставшиеся ожидания
+		mock.ExpectationsWereMet()
+
+		// Используем тот же точный SQL запрос
+		expectedSQL := `
+            SELECT u.* FROM users u
+            JOIN user_locations l ON u.id = l.user_id
+            WHERE (
+                6371 * acos(
+                    cos(radians($1)) * cos(radians(l.latitude)) * 
+                    cos(radians(l.longitude) - radians($2)) + 
+                    sin(radians($3)) * sin(radians(l.latitude))
+                )
+            ) <= $4
+            LIMIT $5
+        `
+		// Убираем лишние пробелы и переводы строк
+		expectedSQL = strings.ReplaceAll(expectedSQL, "\n", " ")
+		expectedSQL = regexp.MustCompile(`\s+`).ReplaceAllString(expectedSQL, " ")
+		expectedSQL = strings.TrimSpace(expectedSQL)
+
 		// Симулируем ошибку при выполнении запроса
-		mock.ExpectQuery(`SELECT u\.\* FROM users u JOIN user_locations l ON u\.id = l\.user_id WHERE \(.*\) <= \? LIMIT \?`).
+		mock.ExpectQuery(regexp.QuoteMeta(expectedSQL)).
 			WithArgs(lat, lon, lat, radiusKm, limit).
 			WillReturnError(errors.New("database query error"))
 
@@ -574,8 +639,8 @@ func TestResilientUserRepository_GetNotificationSettings(t *testing.T) {
 		nonExistentID := uint(999)
 
 		// Настраиваем ожидаемое поведение SQL-мока
-		mock.ExpectQuery(`SELECT (.+) FROM "user_notification_settings" WHERE user_id = (.+) LIMIT 1`).
-			WithArgs(nonExistentID).
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "user_notification_settings" WHERE user_id = $1 LIMIT $2`)).
+			WithArgs(nonExistentID, 1).
 			WillReturnError(gorm.ErrRecordNotFound)
 
 		// Выполняем тестируемый метод
@@ -595,16 +660,16 @@ func TestResilientUserRepository_GetNotificationSettings(t *testing.T) {
 	// Тест: Обработка временной ошибки БД
 	t.Run("DatabaseErrorHandling", func(t *testing.T) {
 		// Первый запрос завершается ошибкой
-		mock.ExpectQuery(`SELECT (.+) FROM "user_notification_settings" WHERE user_id = (.+) LIMIT 1`).
-			WithArgs(userID).
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "user_notification_settings" WHERE user_id = $1 LIMIT $2`)).
+			WithArgs(userID, 1).
 			WillReturnError(errors.New("temporary database error"))
 
 		// Второй запрос (повторная попытка) успешен
 		rows := sqlmock.NewRows([]string{"id", "user_id", "new_event_notification"}).
 			AddRow(1, userID, true)
 
-		mock.ExpectQuery(`SELECT (.+) FROM "user_notification_settings" WHERE user_id = (.+) LIMIT 1`).
-			WithArgs(userID).
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "user_notification_settings" WHERE user_id = $1 LIMIT $2`)).
+			WithArgs(userID, 1).
 			WillReturnRows(rows)
 
 		// Выполняем тестируемый метод
