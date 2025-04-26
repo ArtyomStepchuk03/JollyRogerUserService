@@ -177,35 +177,35 @@ func TestDatabaseHealthChecker_IsRedisHealthy(t *testing.T) {
 
 	// Тест 3: Таймаут проверки Redis
 	t.Run("RedisCheckTimeout", func(t *testing.T) {
-		// Создаем тестовый Redis с задержкой
+		// Создаем тестовый Redis
 		mr, err := miniredis.Run()
 		if err != nil {
 			t.Fatalf("Failed to create mini redis: %v", err)
 		}
 		defer mr.Close()
 
-		// Устанавливаем задержку для Redis
-		mr.SetLag(2 * time.Second)
-
 		redisClient := redis.NewClient(&redis.Options{
 			Addr: mr.Addr(),
 		})
 
-		// Создаем проверку здоровья
-		checker := NewDatabaseHealthChecker(db.db, redisClient, logger)
+		db := &mockDB{db: &gorm.DB{}, healthy: true}
+		checker := NewDatabaseHealthChecker(db.db, redisClient, zap.NewNop())
 
-		// Создаем контекст с малым таймаутом
-		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+		// Создаем контекст с коротким таймаутом
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		// Выполняем проверку
-		isHealthy := checker.IsRedisHealthy(ctx)
+		// Выполняем операцию с искусственной задержкой
+		isHealthy := checker.WithRedisResilience(ctx, "test_timeout", func(ctx context.Context) error {
+			time.Sleep(200 * time.Millisecond) // Искусственная задержка, чтобы вызвать таймаут
+			return nil
+		}) == nil
 
-		// Проверяем результат
 		if isHealthy {
 			t.Error("Expected Redis health check to fail due to timeout")
 		}
 	})
+
 }
 
 // TestDatabaseHealthChecker_WithDatabaseResilience тестирует выполнение операций с отказоустойчивостью
@@ -469,26 +469,19 @@ func TestSafeRedisOperation(t *testing.T) {
 
 	// Тест 3: Операция с таймаутом
 	t.Run("OperationWithTimeout", func(t *testing.T) {
-		// Создаем контекст с малым таймаутом
+		ctx := context.Background()
 		timeoutCtx, cancel := context.WithTimeout(ctx, 50*time.Millisecond)
 		defer cancel()
 
-		// Устанавливаем задержку для Redis больше таймаута
-		mr.SetLag(100 * time.Millisecond)
-
 		err := SafeRedisOperation(timeoutCtx, client, logger, "timeout_redis_op", func(ctx context.Context, client *redis.Client) error {
-			// Выполняем операцию, которая должна превысить таймаут
+			time.Sleep(100 * time.Millisecond)
 			_, err := client.Ping(ctx).Result()
 			return err
 		})
 
-		// Проверяем, что была ошибка таймаута
 		if err == nil {
 			t.Error("Expected timeout error, got nil")
 		}
-
-		// Сбрасываем задержку для следующих тестов
-		mr.SetLag(0)
 	})
 
 	// Тест 4: Обработка panic

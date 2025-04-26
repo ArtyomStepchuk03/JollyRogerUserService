@@ -11,8 +11,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Используем интерфейс HealthCheckerInterface из пакета server
-
 // mockHealthChecker создает тестовую версию DatabaseHealthChecker
 type mockHealthChecker struct {
 	pgHealthy    bool

@@ -17,7 +17,7 @@ test-integration:
 
 # Запуск всех тестов с покрытием
 test-coverage:
-	go test -v -coverprofile=coverage.out ./internal/... ./test/... ./pkg/...
+	go test -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 
 # Линтинг кода
