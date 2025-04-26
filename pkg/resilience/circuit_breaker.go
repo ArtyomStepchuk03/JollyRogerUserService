@@ -44,6 +44,11 @@ func NewCircuitBreaker(failureThreshold int, resetTimeout time.Duration, logger 
 	}
 }
 
+// DefaultCircuitBreakerOptions возвращает рекомендуемые настройки Circuit Breaker
+func DefaultCircuitBreakerOptions() (int, time.Duration) {
+	return 5, 30 * time.Second // 5 ошибок для срабатывания, сброс через 30 секунд
+}
+
 // Execute выполняет функцию с учетом состояния circuit breaker
 func (cb *CircuitBreaker) Execute(ctx context.Context, operation string, fn func(context.Context) error) error {
 	// Проверяем состояние circuit breaker

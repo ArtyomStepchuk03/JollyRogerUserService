@@ -25,7 +25,6 @@ WORKDIR /app
 
 # Копируем скомпилированное приложение
 COPY --from=builder /app/user-service .
-COPY --from=builder /app/config/config.yaml ./config/
 
 # Устанавливаем переменные окружения
 ENV TZ=UTC \

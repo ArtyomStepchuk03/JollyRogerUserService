@@ -19,7 +19,7 @@ type ResilientCacheRepository struct {
 	client        *redis.Client
 	repo          *CacheRepository
 	logger        *zap.Logger
-	healthChecker *database.DatabaseHealthChecker
+	healthChecker *database.HealthChecker
 }
 
 // NewResilientCacheRepository создает новый экземпляр отказоустойчивого кэш-репозитория

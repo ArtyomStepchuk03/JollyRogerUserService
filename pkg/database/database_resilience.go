@@ -11,8 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// DatabaseHealthChecker предоставляет функции для проверки состояния баз данных
-type DatabaseHealthChecker struct {
+// HealthChecker предоставляет функции для проверки состояния баз данных
+type HealthChecker struct {
 	db           *gorm.DB
 	redisClient  *redis.Client
 	logger       *zap.Logger
@@ -21,18 +21,20 @@ type DatabaseHealthChecker struct {
 }
 
 // NewDatabaseHealthChecker создает новый экземпляр проверки состояния баз данных
-func NewDatabaseHealthChecker(db *gorm.DB, redisClient *redis.Client, logger *zap.Logger) *DatabaseHealthChecker {
-	return &DatabaseHealthChecker{
+func NewDatabaseHealthChecker(db *gorm.DB, redisClient *redis.Client, logger *zap.Logger) *HealthChecker {
+	failureThreshold, resetTimeout := resilience.DefaultCircuitBreakerOptions()
+
+	return &HealthChecker{
 		db:           db,
 		redisClient:  redisClient,
 		logger:       logger,
-		pgCircuit:    resilience.NewCircuitBreaker(5, 30*time.Second, logger),
-		redisCircuit: resilience.NewCircuitBreaker(5, 10*time.Second, logger),
+		pgCircuit:    resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger),
+		redisCircuit: resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger),
 	}
 }
 
 // IsDatabaseHealthy проверяет здоровье PostgreSQL
-func (c *DatabaseHealthChecker) IsDatabaseHealthy(ctx context.Context) bool {
+func (c *HealthChecker) IsDatabaseHealthy(ctx context.Context) bool {
 	var result int
 	err := c.pgCircuit.Execute(ctx, "postgres_health_check", func(ctx context.Context) error {
 		// Проверяем подключение к PostgreSQL с таймаутом
@@ -52,7 +54,7 @@ func (c *DatabaseHealthChecker) IsDatabaseHealthy(ctx context.Context) bool {
 }
 
 // IsRedisHealthy проверяет здоровье Redis
-func (c *DatabaseHealthChecker) IsRedisHealthy(ctx context.Context) bool {
+func (c *HealthChecker) IsRedisHealthy(ctx context.Context) bool {
 	var err error
 	err = c.redisCircuit.Execute(ctx, "redis_health_check", func(ctx context.Context) error {
 		// Проверяем подключение к Redis с таймаутом
@@ -68,12 +70,12 @@ func (c *DatabaseHealthChecker) IsRedisHealthy(ctx context.Context) bool {
 }
 
 // WithDatabaseResilience выполняет операцию в базе данных с механизмами отказоустойчивости
-func (c *DatabaseHealthChecker) WithDatabaseResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
+func (c *HealthChecker) WithDatabaseResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
 	return c.pgCircuit.Execute(ctx, operation, fn)
 }
 
 // WithRedisResilience выполняет операцию в Redis с механизмами отказоустойчивости
-func (c *DatabaseHealthChecker) WithRedisResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
+func (c *HealthChecker) WithRedisResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
 	return c.redisCircuit.Execute(ctx, operation, fn)
 }
 

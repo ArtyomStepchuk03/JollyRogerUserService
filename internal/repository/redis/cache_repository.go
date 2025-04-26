@@ -234,7 +234,7 @@ func (r *CacheRepository) GetNotificationSettings(ctx context.Context, userID ui
 	return &settings, nil
 }
 
-// ClearCache очищает весь кэш пользователя
+// ClearUserCache очищает весь кэш пользователя
 func (r *CacheRepository) ClearUserCache(ctx context.Context, userID uint) error {
 	// Паттерн для поиска всех ключей, связанных с пользователем
 	pattern := fmt.Sprintf("user:%d:*", userID)

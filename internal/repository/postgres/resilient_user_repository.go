@@ -18,7 +18,7 @@ type ResilientUserRepository struct {
 	db            *gorm.DB
 	repo          *UserRepository
 	logger        *zap.Logger
-	healthChecker *database.DatabaseHealthChecker
+	healthChecker *database.HealthChecker
 }
 
 // NewResilientUserRepository создает новый экземпляр отказоустойчивого репозитория
@@ -260,9 +260,19 @@ func (r *ResilientUserRepository) GetNotificationSettings(userID uint) (*models.
 	var settings *models.UserNotificationSetting
 	var err error
 
-	err = r.healthChecker.WithDatabaseResilience(ctx, "get_notification_settings", func(ctx context.Context) error {
-		settings, err = r.repo.GetNotificationSettings(userID)
-		return err
+	// Add retry logic here using WithRetry to handle temporary errors
+	retryOptions := resilience.RetryOptions{
+		MaxRetries:     2,
+		InitialBackoff: 50 * time.Millisecond,
+		MaxBackoff:     100 * time.Millisecond,
+		BackoffFactor:  1.5,
+		Jitter:         0.1,
+	}
+
+	err = resilience.WithRetry(ctx, r.logger, "get_notification_settings", retryOptions, func(ctx context.Context) error {
+		var opErr error
+		settings, opErr = r.repo.GetNotificationSettings(userID)
+		return opErr
 	})
 
 	return settings, err

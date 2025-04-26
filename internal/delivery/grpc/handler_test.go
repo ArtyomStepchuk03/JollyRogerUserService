@@ -35,7 +35,7 @@ func NewMockUserService() *MockUserService {
 }
 
 // CreateUser - мок для создания пользователя
-func (m *MockUserService) CreateUser(ctx context.Context, req *models.CreateUserRequest) (*models.User, error) {
+func (m *MockUserService) CreateUser(_ context.Context, req *models.CreateUserRequest) (*models.User, error) {
 	// Проверяем, существует ли пользователь с таким telegram_id
 	if _, exists := m.usersByTg[req.TelegramID]; exists {
 		return nil, errors.New("user with this telegram_id already exists")
@@ -56,7 +56,7 @@ func (m *MockUserService) CreateUser(ctx context.Context, req *models.CreateUser
 }
 
 // GetUser - мок для получения пользователя по ID
-func (m *MockUserService) GetUser(ctx context.Context, id uint) (*models.User, error) {
+func (m *MockUserService) GetUser(_ context.Context, id uint) (*models.User, error) {
 	user, exists := m.users[id]
 	if !exists {
 		return nil, errors.New("user not found")
@@ -65,7 +65,7 @@ func (m *MockUserService) GetUser(ctx context.Context, id uint) (*models.User, e
 }
 
 // GetUserByTelegramID - мок для получения пользователя по Telegram ID
-func (m *MockUserService) GetUserByTelegramID(ctx context.Context, telegramID int64) (*models.User, error) {
+func (m *MockUserService) GetUserByTelegramID(_ context.Context, telegramID int64) (*models.User, error) {
 	user, exists := m.usersByTg[telegramID]
 	if !exists {
 		return nil, errors.New("user not found")
@@ -74,7 +74,7 @@ func (m *MockUserService) GetUserByTelegramID(ctx context.Context, telegramID in
 }
 
 // UpdateUser - мок для обновления пользователя
-func (m *MockUserService) UpdateUser(ctx context.Context, id uint, username, bio string) (*models.User, error) {
+func (m *MockUserService) UpdateUser(_ context.Context, id uint, username, bio string) (*models.User, error) {
 	user, exists := m.users[id]
 	if !exists {
 		return nil, errors.New("user not found")
@@ -87,7 +87,7 @@ func (m *MockUserService) UpdateUser(ctx context.Context, id uint, username, bio
 }
 
 // AddUserPreference - мок для добавления предпочтения
-func (m *MockUserService) AddUserPreference(ctx context.Context, userID, tagID uint) error {
+func (m *MockUserService) AddUserPreference(_ context.Context, userID, tagID uint) error {
 	if _, exists := m.users[userID]; !exists {
 		return errors.New("user not found")
 	}
@@ -108,7 +108,7 @@ func (m *MockUserService) AddUserPreference(ctx context.Context, userID, tagID u
 }
 
 // RemoveUserPreference - мок для удаления предпочтения
-func (m *MockUserService) RemoveUserPreference(ctx context.Context, userID, tagID uint) error {
+func (m *MockUserService) RemoveUserPreference(_ context.Context, userID, tagID uint) error {
 	if _, exists := m.users[userID]; !exists {
 		return errors.New("user not found")
 	}
@@ -125,7 +125,7 @@ func (m *MockUserService) RemoveUserPreference(ctx context.Context, userID, tagI
 }
 
 // GetUserPreferences - мок для получения предпочтений
-func (m *MockUserService) GetUserPreferences(ctx context.Context, userID uint) ([]models.UserPreference, error) {
+func (m *MockUserService) GetUserPreferences(_ context.Context, userID uint) ([]models.UserPreference, error) {
 	if _, exists := m.users[userID]; !exists {
 		return nil, errors.New("user not found")
 	}
@@ -134,7 +134,7 @@ func (m *MockUserService) GetUserPreferences(ctx context.Context, userID uint) (
 }
 
 // UpdateUserLocation - мок для обновления местоположения
-func (m *MockUserService) UpdateUserLocation(ctx context.Context, req *models.UserLocationRequest) error {
+func (m *MockUserService) UpdateUserLocation(_ context.Context, req *models.UserLocationRequest) error {
 	if _, exists := m.users[req.UserID]; !exists {
 		return errors.New("user not found")
 	}
@@ -153,7 +153,7 @@ func (m *MockUserService) UpdateUserLocation(ctx context.Context, req *models.Us
 }
 
 // GetUserLocation - мок для получения местоположения
-func (m *MockUserService) GetUserLocation(ctx context.Context, userID uint) (*models.UserLocation, error) {
+func (m *MockUserService) GetUserLocation(_ context.Context, userID uint) (*models.UserLocation, error) {
 	if _, exists := m.users[userID]; !exists {
 		return nil, errors.New("user not found")
 	}
@@ -167,7 +167,7 @@ func (m *MockUserService) GetUserLocation(ctx context.Context, userID uint) (*mo
 }
 
 // FindNearbyUsers - мок для поиска пользователей рядом
-func (m *MockUserService) FindNearbyUsers(ctx context.Context, lat, lon float64, radiusKm float64, limit int) ([]models.User, error) {
+func (m *MockUserService) FindNearbyUsers(_ context.Context, _, _ float64, _ float64, limit int) ([]models.User, error) {
 	// Упрощенная реализация для тестов
 	var users []models.User
 	for _, user := range m.users {
@@ -180,7 +180,7 @@ func (m *MockUserService) FindNearbyUsers(ctx context.Context, lat, lon float64,
 }
 
 // GetUserStats - мок для получения статистики
-func (m *MockUserService) GetUserStats(ctx context.Context, userID uint) (*models.UserStats, error) {
+func (m *MockUserService) GetUserStats(_ context.Context, userID uint) (*models.UserStats, error) {
 	if _, exists := m.users[userID]; !exists {
 		return nil, errors.New("user not found")
 	}
@@ -200,7 +200,7 @@ func (m *MockUserService) GetUserStats(ctx context.Context, userID uint) (*model
 }
 
 // UpdateUserRating - мок для обновления рейтинга
-func (m *MockUserService) UpdateUserRating(ctx context.Context, userID uint, ratingChange float32) (*models.User, error) {
+func (m *MockUserService) UpdateUserRating(_ context.Context, userID uint, ratingChange float32) (*models.User, error) {
 	user, exists := m.users[userID]
 	if !exists {
 		return nil, errors.New("user not found")
@@ -211,7 +211,7 @@ func (m *MockUserService) UpdateUserRating(ctx context.Context, userID uint, rat
 }
 
 // GetNotificationSettings - мок для получения настроек уведомлений
-func (m *MockUserService) GetNotificationSettings(ctx context.Context, userID uint) (*models.UserNotificationSetting, error) {
+func (m *MockUserService) GetNotificationSettings(_ context.Context, userID uint) (*models.UserNotificationSetting, error) {
 	if _, exists := m.users[userID]; !exists {
 		return nil, errors.New("user not found")
 	}
@@ -230,7 +230,7 @@ func (m *MockUserService) GetNotificationSettings(ctx context.Context, userID ui
 }
 
 // UpdateNotificationSettings - мок для обновления настроек уведомлений
-func (m *MockUserService) UpdateNotificationSettings(ctx context.Context, req *models.UpdateNotificationSettingRequest) error {
+func (m *MockUserService) UpdateNotificationSettings(_ context.Context, req *models.UpdateNotificationSettingRequest) error {
 	if _, exists := m.users[req.UserID]; !exists {
 		return errors.New("user not found")
 	}
