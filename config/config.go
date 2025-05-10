@@ -53,7 +53,7 @@ func LoadConfig() (*Config, error) {
 	}
 
 	// Конфигурация приложения
-	appEnv := getEnv("APP_ENV", "development") // По умолчанию production
+	appEnv := getEnv("APP_ENV", "development") // По умолчанию development
 	version := getEnv("APP_VERSION", "1.0.0")  // По умолчанию версия 1.0.0
 	logLevel := getEnv("LOG_LEVEL", "info")    // По умолчанию info
 

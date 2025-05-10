@@ -41,7 +41,7 @@ func (s *DevEnvironmentSeeder) SeedTestUser() error {
 	repo := postgres.NewUserRepository(s.db)
 
 	// Проверяем, существует ли уже тестовый пользователь
-	existingUser, err := repo.GetByTelegramID(1)
+	existingUser, err := repo.GetByTelegramID(123)
 	if err == nil && existingUser != nil {
 		s.logger.Info("Тестовый пользователь уже существует", zap.Uint("user_id", existingUser.ID))
 		return nil
@@ -49,7 +49,7 @@ func (s *DevEnvironmentSeeder) SeedTestUser() error {
 
 	// Создаем тестового пользователя
 	testUser := &models.User{
-		TelegramID: 1,
+		TelegramID: 123,
 		Username:   "Uruz",
 		Bio:        "Это тестовый пользователь, автоматически созданный в режиме разработки",
 		Rating:     5.0,
