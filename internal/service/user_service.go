@@ -4,6 +4,7 @@ import (
 	"JollyRogerUserService/internal/models"
 	"context"
 	"errors"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"time"
@@ -112,25 +113,32 @@ func (s *UserService) GetUser(ctx context.Context, id uint) (*models.User, error
 	// Пытаемся получить пользователя из кэша
 	user, err := s.cacheRepo.GetUser(ctx, id)
 	if err == nil {
-		s.logger.Debug("User retrieved from cache", zap.Uint("user_id", id))
+		s.logger.Debug("Пользователь получен из кэша", zap.Uint("user_id", id))
 		return user, nil
+	}
+
+	// Если ошибка не связана с отсутствием ключа, логируем её
+	if !errors.Is(err, redis.Nil) {
+		s.logger.Warn("Ошибка при получении пользователя из кэша",
+			zap.Error(err),
+			zap.Uint("user_id", id))
 	}
 
 	// Если не удалось, получаем из БД
 	user, err = s.userRepo.GetByID(id)
 	if err != nil {
-		s.logger.Error("Failed to get user", zap.Error(err), zap.Uint("user_id", id))
+		s.logger.Error("Не удалось получить пользователя из БД", zap.Error(err), zap.Uint("user_id", id))
 		return nil, err
 	}
 
 	// Обновляем время последней активности
 	if err := s.userRepo.UpdateLastActive(id); err != nil {
-		s.logger.Warn("Failed to update last active time", zap.Error(err), zap.Uint("user_id", id))
+		s.logger.Warn("Не удалось обновить время последней активности", zap.Error(err), zap.Uint("user_id", id))
 	}
 
 	// Кэшируем пользователя
 	if err := s.cacheRepo.SetUser(ctx, user); err != nil {
-		s.logger.Warn("Failed to cache user", zap.Error(err), zap.Uint("user_id", id))
+		s.logger.Warn("Не удалось кэшировать пользователя", zap.Error(err), zap.Uint("user_id", id))
 	}
 
 	return user, nil

@@ -191,7 +191,7 @@ func TestRetryMechanism_RetryableErrors(t *testing.T) {
 		})
 
 		if err != nil {
-			t.Errorf("Expected success with empty retryable errors list, got: %v", err)
+			t.Errorf("Expected success with empty retryable apperrors list, got: %v", err)
 		}
 
 		expectedCalls := emptyOptions.MaxRetries + 1

@@ -86,15 +86,22 @@ func (r *ResilientCacheRepository) GetUser(ctx context.Context, id uint) (*model
 	err := resilience.WithRetry(ctx, r.logger, "get_user_cache", retryOptions, func(ctx context.Context) error {
 		var opErr error
 		user, opErr = r.repo.GetUser(ctx, id)
-		// Ошибка "ключ не найден" не должна приводить к повторам
+
+		// Важное изменение: если ключ не найден, это не ошибка для circuit breaker
 		if errors.Is(opErr, redis.Nil) {
-			return opErr
+			r.logger.Debug("Пользователь не найден в кэше", zap.Uint("user_id", id))
+			return redis.Nil // Возвращаем ошибку для обработки вне retry
 		}
 		return opErr
 	})
 
-	// Записываем метрику
-	server.RecordCacheOperation("get_user", time.Since(startTime), err)
+	// Записываем метрику только для реальных ошибок, а не для отсутствия ключа
+	if err != nil && !errors.Is(err, redis.Nil) {
+		server.RecordCacheOperation("get_user", time.Since(startTime), err)
+	} else {
+		// Для случая отсутствия ключа или успешной операции записываем успешную метрику
+		server.RecordCacheOperation("get_user", time.Since(startTime), nil)
+	}
 
 	return user, err
 }

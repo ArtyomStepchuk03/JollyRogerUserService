@@ -19,7 +19,7 @@ scrape_configs:
     metrics_path: "/metrics"
     scrape_interval: 5s
     static_configs:
-      - targets: ["userservice:50053"]  # Предполагая, что HEALTH_PORT=50052, а metrics порт = HEALTH_PORT + 1
+      - targets: ["userservice:50151"]
 
   - job_name: "postgres"
     static_configs:

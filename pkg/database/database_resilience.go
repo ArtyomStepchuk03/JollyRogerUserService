@@ -1,6 +1,7 @@
 package database
 
 import (
+	"JollyRogerUserService/pkg/apperrors"
 	"context"
 	"errors"
 	"time"
@@ -28,8 +29,8 @@ func NewDatabaseHealthChecker(db *gorm.DB, redisClient *redis.Client, logger *za
 		db:           db,
 		redisClient:  redisClient,
 		logger:       logger,
-		pgCircuit:    resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger),
-		redisCircuit: resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger),
+		pgCircuit:    resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger, apperrors.IgnoredErrors...),
+		redisCircuit: resilience.NewCircuitBreaker(failureThreshold, resetTimeout, logger, apperrors.IgnoredErrors...),
 	}
 }
 
@@ -71,12 +72,40 @@ func (c *HealthChecker) IsRedisHealthy(ctx context.Context) bool {
 
 // WithDatabaseResilience выполняет операцию в базе данных с механизмами отказоустойчивости
 func (c *HealthChecker) WithDatabaseResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
-	return c.pgCircuit.Execute(ctx, operation, fn)
+	err := c.pgCircuit.Execute(ctx, operation, fn)
+
+	// Если получили ошибку redis.Nil или gorm.ErrRecordNotFound, не считаем её ошибкой для circuit breaker
+	if errors.Is(err, redis.Nil) || errors.Is(err, gorm.ErrRecordNotFound) {
+		logLevel := c.logger.Debug
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logLevel = c.logger.Debug
+		}
+
+		logLevel("Запись не найдена, это не ошибка для circuit breaker",
+			zap.String("operation", operation),
+			zap.Error(err))
+
+		// Все равно возвращаем ошибку для обработки на уровне бизнес-логики
+		return err
+	}
+
+	return err
 }
 
 // WithRedisResilience выполняет операцию в Redis с механизмами отказоустойчивости
 func (c *HealthChecker) WithRedisResilience(ctx context.Context, operation string, fn func(ctx context.Context) error) error {
-	return c.redisCircuit.Execute(ctx, operation, fn)
+	err := c.redisCircuit.Execute(ctx, operation, fn)
+
+	// Если получили ошибку redis.Nil, не считаем её ошибкой для circuit breaker
+	if errors.Is(err, redis.Nil) {
+		c.logger.Debug("Ключ не найден в Redis, это не ошибка для circuit breaker",
+			zap.String("operation", operation))
+
+		// Все равно возвращаем ошибку для обработки на уровне бизнес-логики
+		return err
+	}
+
+	return err
 }
 
 // SafeDBOperation выполняет операцию в базе данных, логируя ошибки и добавляя контекст

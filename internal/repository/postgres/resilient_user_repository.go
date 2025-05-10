@@ -3,6 +3,7 @@ package postgres
 import (
 	"JollyRogerUserService/pkg/server"
 	"context"
+	"errors"
 	"github.com/redis/go-redis/v9"
 	"time"
 
@@ -62,12 +63,24 @@ func (r *ResilientUserRepository) GetByID(id uint) (*models.User, error) {
 
 		return resilience.WithRetry(ctx, r.logger, "get_user_by_id", retryOptions, func(ctx context.Context) error {
 			user, err = r.repo.GetByID(id)
+
+			// Добавляем специальную обработку ошибки "запись не найдена"
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				r.logger.Debug("Пользователь не найден в БД", zap.Uint("user_id", id))
+				return gorm.ErrRecordNotFound // Возвращаем ошибку для обработки вне retry
+			}
+
 			return err
 		})
 	})
 
-	// Записываем метрику
-	server.RecordDBOperation("get_user_by_id", time.Since(startTime), err)
+	// Записываем метрику только для реальных ошибок, а не для отсутствия записи
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		server.RecordDBOperation("get_user_by_id", time.Since(startTime), err)
+	} else {
+		// Для случая отсутствия записи или успешной операции записываем успешную метрику
+		server.RecordDBOperation("get_user_by_id", time.Since(startTime), nil)
+	}
 
 	return user, err
 }
@@ -260,7 +273,7 @@ func (r *ResilientUserRepository) GetNotificationSettings(userID uint) (*models.
 	var settings *models.UserNotificationSetting
 	var err error
 
-	// Add retry logic here using WithRetry to handle temporary errors
+	// Add retry logic here using WithRetry to handle temporary apperrors
 	retryOptions := resilience.RetryOptions{
 		MaxRetries:     2,
 		InitialBackoff: 50 * time.Millisecond,

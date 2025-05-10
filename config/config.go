@@ -1,13 +1,22 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
+
+// AppConfig содержит конфигурацию для всего приложения
+type AppConfig struct {
+	AppEnv   string // Среда приложения (development, staging, production)
+	Version  string // Версия приложения
+	LogLevel string // Уровень логирования
+}
 
 // Config содержит все настройки приложения
 type Config struct {
+	App      AppConfig
 	Postgres PostgresConfig
 	Redis    RedisConfig
 	GRPC     GRPCConfig
@@ -35,7 +44,7 @@ type GRPCConfig struct {
 	Port int
 }
 
-// LoadConfig загружает настройки из .env файла
+// LoadConfig загружает настройки из .env файла и переменных окружения
 func LoadConfig() (*Config, error) {
 	// Загружаем .env файл
 	if err := godotenv.Load(); err != nil {
@@ -43,7 +52,17 @@ func LoadConfig() (*Config, error) {
 		// Продолжаем работать с переменными окружения
 	}
 
+	// Конфигурация приложения
+	appEnv := getEnv("APP_ENV", "development") // По умолчанию production
+	version := getEnv("APP_VERSION", "1.0.0")  // По умолчанию версия 1.0.0
+	logLevel := getEnv("LOG_LEVEL", "info")    // По умолчанию info
+
 	config := &Config{
+		App: AppConfig{
+			AppEnv:   appEnv,
+			Version:  version,
+			LogLevel: logLevel,
+		},
 		Postgres: loadPostgresConfig(),
 		Redis:    loadRedisConfig(),
 		GRPC:     loadGRPCConfig(),

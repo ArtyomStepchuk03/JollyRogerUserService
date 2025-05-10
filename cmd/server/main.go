@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"JollyRogerUserService/config"
+	"JollyRogerUserService/internal/database/seed"
 	"JollyRogerUserService/internal/delivery/grpc"
 	"JollyRogerUserService/internal/repository/postgres"
 	"JollyRogerUserService/internal/repository/redis"
@@ -17,6 +18,7 @@ import (
 	"JollyRogerUserService/pkg/logger"
 	userProto "JollyRogerUserService/pkg/proto/user"
 	"JollyRogerUserService/pkg/server"
+
 	"go.uber.org/zap"
 	grpcServer "google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -32,18 +34,18 @@ const (
 func main() {
 	// Инициализация логгера
 	log := logger.NewLogger()
-	log.Info("Starting user service", zap.String("version", ServiceVersion))
+	log.Info("Запуск сервиса пользователей", zap.String("version", ServiceVersion))
 
 	// Загрузка конфигурации
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal("Failed to load config", zap.Error(err))
+		log.Fatal("Не удалось загрузить конфигурацию", zap.Error(err))
 	}
 
 	// Определение номеров портов
 	grpcPort := cfg.GRPC.Port
-	healthPort := grpcPort + 1
-	metricsPort := grpcPort + 2
+	healthPort := grpcPort + 100
+	metricsPort := grpcPort + 200
 
 	// Создаем механизм graceful shutdown
 	gracefulShutdown := server.NewGracefulShutdown(log, 30*time.Second)
@@ -51,34 +53,44 @@ func main() {
 	// Подключение к PostgreSQL
 	db, err := database.NewPostgresDB(cfg.Postgres)
 	if err != nil {
-		log.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
+		log.Fatal("Не удалось подключиться к PostgreSQL", zap.Error(err))
 	}
-	log.Info("Connected to PostgreSQL")
+	log.Info("Подключение к PostgreSQL установлено")
 
 	// Получаем базовое подключение к PostgreSQL для закрытия
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatal("Failed to get SQL DB instance", zap.Error(err))
+		log.Fatal("Не удалось получить экземпляр SQL DB", zap.Error(err))
 	}
 
 	// Добавляем закрытие соединения с PostgreSQL при завершении
 	gracefulShutdown.AddShutdownFunc(func(ctx context.Context) error {
-		log.Info("Closing PostgreSQL connection")
+		log.Info("Закрытие соединения с PostgreSQL")
 		return sqlDB.Close()
 	})
 
 	// Подключение к Redis
 	redisClient, err := database.NewRedisClient(cfg.Redis)
 	if err != nil {
-		log.Fatal("Failed to connect to Redis", zap.Error(err))
+		log.Fatal("Не удалось подключиться к Redis", zap.Error(err))
 	}
-	log.Info("Connected to Redis")
+	log.Info("Подключение к Redis установлено")
 
 	// Добавляем закрытие соединения с Redis при завершении
 	gracefulShutdown.AddShutdownFunc(func(ctx context.Context) error {
-		log.Info("Closing Redis connection")
+		log.Info("Закрытие соединения с Redis")
 		return redisClient.Close()
 	})
+
+	// Заполняем данными разработки, если нужно
+	if cfg.App.AppEnv == "development" {
+		log.Info("Обнаружена среда разработки, заполняем тестовыми данными")
+		seeder := seed.NewDevEnvironmentSeeder(db, log)
+		if err := seeder.SeedAllDevData(context.Background()); err != nil {
+			log.Warn("Не удалось заполнить данными разработки", zap.Error(err))
+			// Мы не хотим прерывать запуск, если заполнение не удалось
+		}
+	}
 
 	// Создаем проверку здоровья баз данных
 	healthChecker := database.NewDatabaseHealthChecker(db, redisClient, log)
@@ -88,7 +100,7 @@ func main() {
 
 	// Добавляем остановку сервера метрик при завершении
 	gracefulShutdown.AddShutdownFunc(func(ctx context.Context) error {
-		log.Info("Stopping metrics server")
+		log.Info("Остановка сервера метрик")
 		return metricsServer.Shutdown(ctx)
 	})
 
@@ -102,7 +114,7 @@ func main() {
 	// Инициализация gRPC сервера
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		log.Fatal("Failed to listen", zap.Error(err))
+		log.Fatal("Не удалось запустить прослушивание порта", zap.Error(err))
 	}
 
 	// Создаем gRPC сервер с перехватчиками для метрик и трассировки
@@ -132,28 +144,28 @@ func main() {
 
 	// Добавляем остановку HTTP сервера для проверки здоровья при завершении
 	gracefulShutdown.AddShutdownFunc(func(ctx context.Context) error {
-		log.Info("Stopping health check server")
+		log.Info("Остановка сервера проверки здоровья")
 		return healthCheck.Stop(ctx)
 	})
 
 	// Добавляем остановку gRPC сервера при завершении
 	gracefulShutdown.AddShutdownFunc(func(ctx context.Context) error {
-		log.Info("Stopping gRPC server")
+		log.Info("Остановка gRPC сервера")
 		s.GracefulStop()
 		return nil
 	})
 
 	// Запуск gRPC сервера в отдельной горутине
 	go func() {
-		log.Info("Starting gRPC server", zap.Int("port", grpcPort))
+		log.Info("Запуск gRPC сервера", zap.Int("port", grpcPort))
 		if err := s.Serve(lis); err != nil {
-			log.Fatal("Failed to serve", zap.Error(err))
+			log.Fatal("Не удалось запустить сервер", zap.Error(err))
 		}
 	}()
 
 	// Логируем информацию о версии и PID
 	hostname, _ := os.Hostname()
-	log.Info("Service started successfully",
+	log.Info("Сервис успешно запущен",
 		zap.Int("grpc_port", grpcPort),
 		zap.Int("health_port", healthPort),
 		zap.Int("metrics_port", metricsPort),
@@ -163,5 +175,5 @@ func main() {
 
 	// Ожидаем сигнала остановки
 	gracefulShutdown.Wait()
-	log.Info("Service shutdown complete")
+	log.Info("Завершение работы сервиса выполнено")
 }

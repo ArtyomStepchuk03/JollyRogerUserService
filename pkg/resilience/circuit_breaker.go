@@ -30,10 +30,11 @@ type CircuitBreaker struct {
 	lastStateChange  time.Time
 	mutex            sync.RWMutex
 	logger           *zap.Logger
+	ignoredErrors    []error // Добавлено: список игнорируемых ошибок
 }
 
 // NewCircuitBreaker создает новый экземпляр CircuitBreaker
-func NewCircuitBreaker(failureThreshold int, resetTimeout time.Duration, logger *zap.Logger) *CircuitBreaker {
+func NewCircuitBreaker(failureThreshold int, resetTimeout time.Duration, logger *zap.Logger, ignoredErrors ...error) *CircuitBreaker {
 	return &CircuitBreaker{
 		state:            CircuitClosed,
 		failureCount:     0,
@@ -41,6 +42,7 @@ func NewCircuitBreaker(failureThreshold int, resetTimeout time.Duration, logger 
 		resetTimeout:     resetTimeout,
 		lastStateChange:  time.Now(),
 		logger:           logger,
+		ignoredErrors:    ignoredErrors,
 	}
 }
 
@@ -102,6 +104,14 @@ func (cb *CircuitBreaker) handleResult(operation string, err error) {
 		cb.transitionToHalfOpen(operation)
 	}
 
+	// Проверяем, является ли ошибка игнорируемой
+	if err != nil && cb.isIgnoredError(err) {
+		cb.logger.Debug("Игнорируем ошибку для circuit breaker",
+			zap.String("operation", operation),
+			zap.Error(err))
+		return
+	}
+
 	// Обрабатываем результат в зависимости от текущего состояния
 	if err != nil {
 		switch cb.state {
@@ -127,6 +137,16 @@ func (cb *CircuitBreaker) handleResult(operation string, err error) {
 			cb.transitionToClosed(operation)
 		}
 	}
+}
+
+// isIgnoredError проверяет, является ли ошибка игнорируемой
+func (cb *CircuitBreaker) isIgnoredError(err error) bool {
+	for _, ignoredErr := range cb.ignoredErrors {
+		if errors.Is(err, ignoredErr) {
+			return true
+		}
+	}
+	return false
 }
 
 // transitionToOpen переводит circuit breaker в открытое состояние

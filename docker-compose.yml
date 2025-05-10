@@ -14,7 +14,7 @@ services:
     expose:
       - "${DB_PORT}"
     networks:
-      - jolly_roger_user_net
+      jolly_roger_user_net:
     logging:
       driver: json-file
       options:
@@ -63,7 +63,10 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - jolly_roger_user_net
+      jolly_roger_user_net:
+      jolly-roger-network:
+        aliases:
+          - user-service
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -79,3 +82,6 @@ volumes:
 networks:
   jolly_roger_user_net:
     name: jolly_roger_user_net
+  jolly-roger-network:
+    external: true
+    name: jolly_roger_network

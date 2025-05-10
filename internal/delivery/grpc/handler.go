@@ -5,9 +5,11 @@ import (
 	"JollyRogerUserService/internal/service"
 	pb "JollyRogerUserService/pkg/proto/user"
 	"context"
+	"errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -34,7 +36,13 @@ func (h *UserHandler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 	// Получаем пользователя из сервиса
 	user, err := h.service.GetUser(ctx, id)
 	if err != nil {
-		h.logger.Error("Failed to get user", zap.Error(err), zap.Uint64("user_id", req.Id))
+		// Специальная обработка случая "запись не найдена"
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			h.logger.Warn("Пользователь не найден", zap.Uint64("user_id", req.Id))
+			return nil, status.Errorf(codes.NotFound, "пользователь не найден")
+		}
+
+		h.logger.Error("Не удалось получить пользователя из БД", zap.Error(err), zap.Uint64("user_id", req.Id))
 		return nil, status.Errorf(codes.NotFound, "user not found: %v", err)
 	}
 
