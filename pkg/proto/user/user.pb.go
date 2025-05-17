@@ -21,6 +21,104 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// HealthCheckRequest - запрос для проверки состояния сервиса
+type HealthCheckRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HealthCheckRequest) Reset() {
+	*x = HealthCheckRequest{}
+	mi := &file_pkg_proto_user_user_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HealthCheckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HealthCheckRequest) ProtoMessage() {}
+
+func (x *HealthCheckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_proto_user_user_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HealthCheckRequest.ProtoReflect.Descriptor instead.
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{0}
+}
+
+// HealthCheckResponse - ответ о состоянии сервиса
+type HealthCheckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`                                                                               // "ok", "degraded", "down"
+	Services      map[string]string      `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // статусы для отдельных сервисов
+	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                                                        // Unix timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HealthCheckResponse) Reset() {
+	*x = HealthCheckResponse{}
+	mi := &file_pkg_proto_user_user_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HealthCheckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HealthCheckResponse) ProtoMessage() {}
+
+func (x *HealthCheckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_proto_user_user_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HealthCheckResponse.ProtoReflect.Descriptor instead.
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HealthCheckResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *HealthCheckResponse) GetServices() map[string]string {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+func (x *HealthCheckResponse) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
 // GetUserRequest - запрос для получения пользователя по ID
 type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -31,7 +129,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[0]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +141,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[0]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +154,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{0}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetUserRequest) GetId() uint64 {
@@ -76,7 +174,7 @@ type GetUserByTelegramIDRequest struct {
 
 func (x *GetUserByTelegramIDRequest) Reset() {
 	*x = GetUserByTelegramIDRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[1]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -88,7 +186,7 @@ func (x *GetUserByTelegramIDRequest) String() string {
 func (*GetUserByTelegramIDRequest) ProtoMessage() {}
 
 func (x *GetUserByTelegramIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[1]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -101,7 +199,7 @@ func (x *GetUserByTelegramIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserByTelegramIDRequest.ProtoReflect.Descriptor instead.
 func (*GetUserByTelegramIDRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{1}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetUserByTelegramIDRequest) GetTelegramId() int64 {
@@ -123,7 +221,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[2]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -135,7 +233,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[2]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -148,7 +246,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{2}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreateUserRequest) GetTelegramId() int64 {
@@ -184,7 +282,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[3]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -196,7 +294,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[3]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -209,7 +307,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{3}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateUserRequest) GetId() uint64 {
@@ -247,7 +345,7 @@ type UserResponse struct {
 
 func (x *UserResponse) Reset() {
 	*x = UserResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[4]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -259,7 +357,7 @@ func (x *UserResponse) String() string {
 func (*UserResponse) ProtoMessage() {}
 
 func (x *UserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[4]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -272,7 +370,7 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{4}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserResponse) GetId() uint64 {
@@ -321,7 +419,7 @@ type AddUserPreferenceRequest struct {
 
 func (x *AddUserPreferenceRequest) Reset() {
 	*x = AddUserPreferenceRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[5]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +431,7 @@ func (x *AddUserPreferenceRequest) String() string {
 func (*AddUserPreferenceRequest) ProtoMessage() {}
 
 func (x *AddUserPreferenceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[5]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +444,7 @@ func (x *AddUserPreferenceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddUserPreferenceRequest.ProtoReflect.Descriptor instead.
 func (*AddUserPreferenceRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{5}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AddUserPreferenceRequest) GetUserId() uint64 {
@@ -374,7 +472,7 @@ type RemoveUserPreferenceRequest struct {
 
 func (x *RemoveUserPreferenceRequest) Reset() {
 	*x = RemoveUserPreferenceRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[6]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -386,7 +484,7 @@ func (x *RemoveUserPreferenceRequest) String() string {
 func (*RemoveUserPreferenceRequest) ProtoMessage() {}
 
 func (x *RemoveUserPreferenceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[6]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -399,7 +497,7 @@ func (x *RemoveUserPreferenceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveUserPreferenceRequest.ProtoReflect.Descriptor instead.
 func (*RemoveUserPreferenceRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{6}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RemoveUserPreferenceRequest) GetUserId() uint64 {
@@ -426,7 +524,7 @@ type GetUserPreferencesRequest struct {
 
 func (x *GetUserPreferencesRequest) Reset() {
 	*x = GetUserPreferencesRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[7]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -438,7 +536,7 @@ func (x *GetUserPreferencesRequest) String() string {
 func (*GetUserPreferencesRequest) ProtoMessage() {}
 
 func (x *GetUserPreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[7]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +549,7 @@ func (x *GetUserPreferencesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserPreferencesRequest.ProtoReflect.Descriptor instead.
 func (*GetUserPreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{7}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetUserPreferencesRequest) GetUserId() uint64 {
@@ -471,7 +569,7 @@ type UserPreference struct {
 
 func (x *UserPreference) Reset() {
 	*x = UserPreference{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[8]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -483,7 +581,7 @@ func (x *UserPreference) String() string {
 func (*UserPreference) ProtoMessage() {}
 
 func (x *UserPreference) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[8]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -496,7 +594,7 @@ func (x *UserPreference) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPreference.ProtoReflect.Descriptor instead.
 func (*UserPreference) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{8}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UserPreference) GetTagId() uint64 {
@@ -516,7 +614,7 @@ type UserPreferencesResponse struct {
 
 func (x *UserPreferencesResponse) Reset() {
 	*x = UserPreferencesResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[9]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -528,7 +626,7 @@ func (x *UserPreferencesResponse) String() string {
 func (*UserPreferencesResponse) ProtoMessage() {}
 
 func (x *UserPreferencesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[9]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -541,7 +639,7 @@ func (x *UserPreferencesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPreferencesResponse.ProtoReflect.Descriptor instead.
 func (*UserPreferencesResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{9}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UserPreferencesResponse) GetPreferences() []*UserPreference {
@@ -566,7 +664,7 @@ type UpdateUserLocationRequest struct {
 
 func (x *UpdateUserLocationRequest) Reset() {
 	*x = UpdateUserLocationRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[10]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -578,7 +676,7 @@ func (x *UpdateUserLocationRequest) String() string {
 func (*UpdateUserLocationRequest) ProtoMessage() {}
 
 func (x *UpdateUserLocationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[10]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -591,7 +689,7 @@ func (x *UpdateUserLocationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserLocationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserLocationRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{10}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UpdateUserLocationRequest) GetUserId() uint64 {
@@ -646,7 +744,7 @@ type GetUserLocationRequest struct {
 
 func (x *GetUserLocationRequest) Reset() {
 	*x = GetUserLocationRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[11]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -658,7 +756,7 @@ func (x *GetUserLocationRequest) String() string {
 func (*GetUserLocationRequest) ProtoMessage() {}
 
 func (x *GetUserLocationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[11]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -671,7 +769,7 @@ func (x *GetUserLocationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserLocationRequest.ProtoReflect.Descriptor instead.
 func (*GetUserLocationRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{11}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetUserLocationRequest) GetUserId() uint64 {
@@ -695,7 +793,7 @@ type UserLocationResponse struct {
 
 func (x *UserLocationResponse) Reset() {
 	*x = UserLocationResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[12]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -707,7 +805,7 @@ func (x *UserLocationResponse) String() string {
 func (*UserLocationResponse) ProtoMessage() {}
 
 func (x *UserLocationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[12]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -720,7 +818,7 @@ func (x *UserLocationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserLocationResponse.ProtoReflect.Descriptor instead.
 func (*UserLocationResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{12}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UserLocationResponse) GetLatitude() float64 {
@@ -771,7 +869,7 @@ type FindNearbyUsersRequest struct {
 
 func (x *FindNearbyUsersRequest) Reset() {
 	*x = FindNearbyUsersRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[13]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -783,7 +881,7 @@ func (x *FindNearbyUsersRequest) String() string {
 func (*FindNearbyUsersRequest) ProtoMessage() {}
 
 func (x *FindNearbyUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[13]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -796,7 +894,7 @@ func (x *FindNearbyUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FindNearbyUsersRequest.ProtoReflect.Descriptor instead.
 func (*FindNearbyUsersRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{13}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *FindNearbyUsersRequest) GetLatitude() float64 {
@@ -837,7 +935,7 @@ type UsersResponse struct {
 
 func (x *UsersResponse) Reset() {
 	*x = UsersResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[14]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -849,7 +947,7 @@ func (x *UsersResponse) String() string {
 func (*UsersResponse) ProtoMessage() {}
 
 func (x *UsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[14]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -862,7 +960,7 @@ func (x *UsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UsersResponse.ProtoReflect.Descriptor instead.
 func (*UsersResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{14}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *UsersResponse) GetUsers() []*UserResponse {
@@ -882,7 +980,7 @@ type GetUserStatsRequest struct {
 
 func (x *GetUserStatsRequest) Reset() {
 	*x = GetUserStatsRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[15]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -894,7 +992,7 @@ func (x *GetUserStatsRequest) String() string {
 func (*GetUserStatsRequest) ProtoMessage() {}
 
 func (x *GetUserStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[15]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -907,7 +1005,7 @@ func (x *GetUserStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetUserStatsRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{15}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetUserStatsRequest) GetUserId() uint64 {
@@ -932,7 +1030,7 @@ type UserStatsResponse struct {
 
 func (x *UserStatsResponse) Reset() {
 	*x = UserStatsResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[16]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -944,7 +1042,7 @@ func (x *UserStatsResponse) String() string {
 func (*UserStatsResponse) ProtoMessage() {}
 
 func (x *UserStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[16]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -957,7 +1055,7 @@ func (x *UserStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserStatsResponse.ProtoReflect.Descriptor instead.
 func (*UserStatsResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{16}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *UserStatsResponse) GetUserId() uint64 {
@@ -1013,7 +1111,7 @@ type UpdateUserRatingRequest struct {
 
 func (x *UpdateUserRatingRequest) Reset() {
 	*x = UpdateUserRatingRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[17]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1025,7 +1123,7 @@ func (x *UpdateUserRatingRequest) String() string {
 func (*UpdateUserRatingRequest) ProtoMessage() {}
 
 func (x *UpdateUserRatingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[17]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1038,7 +1136,7 @@ func (x *UpdateUserRatingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRatingRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRatingRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{17}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *UpdateUserRatingRequest) GetUserId() uint64 {
@@ -1066,7 +1164,7 @@ type UpdateNotificationSettingsRequest struct {
 
 func (x *UpdateNotificationSettingsRequest) Reset() {
 	*x = UpdateNotificationSettingsRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[18]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1078,7 +1176,7 @@ func (x *UpdateNotificationSettingsRequest) String() string {
 func (*UpdateNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[18]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +1189,7 @@ func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use UpdateNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{18}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *UpdateNotificationSettingsRequest) GetUserId() uint64 {
@@ -1118,7 +1216,7 @@ type GetNotificationSettingsRequest struct {
 
 func (x *GetNotificationSettingsRequest) Reset() {
 	*x = GetNotificationSettingsRequest{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[19]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1130,7 +1228,7 @@ func (x *GetNotificationSettingsRequest) String() string {
 func (*GetNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[19]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1143,7 +1241,7 @@ func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{19}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetNotificationSettingsRequest) GetUserId() uint64 {
@@ -1163,7 +1261,7 @@ type NotificationSettingsResponse struct {
 
 func (x *NotificationSettingsResponse) Reset() {
 	*x = NotificationSettingsResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[20]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1175,7 +1273,7 @@ func (x *NotificationSettingsResponse) String() string {
 func (*NotificationSettingsResponse) ProtoMessage() {}
 
 func (x *NotificationSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[20]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1188,7 +1286,7 @@ func (x *NotificationSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationSettingsResponse.ProtoReflect.Descriptor instead.
 func (*NotificationSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{20}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *NotificationSettingsResponse) GetNewEventNotification() bool {
@@ -1209,7 +1307,7 @@ type SimpleResponse struct {
 
 func (x *SimpleResponse) Reset() {
 	*x = SimpleResponse{}
-	mi := &file_pkg_proto_user_user_proto_msgTypes[21]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1221,7 +1319,7 @@ func (x *SimpleResponse) String() string {
 func (*SimpleResponse) ProtoMessage() {}
 
 func (x *SimpleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_proto_user_user_proto_msgTypes[21]
+	mi := &file_pkg_proto_user_user_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1234,7 +1332,7 @@ func (x *SimpleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SimpleResponse.ProtoReflect.Descriptor instead.
 func (*SimpleResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{21}
+	return file_pkg_proto_user_user_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SimpleResponse) GetSuccess() bool {
@@ -1255,7 +1353,15 @@ var File_pkg_proto_user_user_proto protoreflect.FileDescriptor
 
 const file_pkg_proto_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x19pkg/proto/user/user.proto\x12\x04user\" \n" +
+	"\x19pkg/proto/user/user.proto\x12\x04user\"\x14\n" +
+	"\x12HealthCheckRequest\"\xcd\x01\n" +
+	"\x13HealthCheckResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12C\n" +
+	"\bservices\x18\x02 \x03(\v2'.user.HealthCheckResponse.ServicesEntryR\bservices\x12\x1c\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x1a;\n" +
+	"\rServicesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\" \n" +
 	"\x0eGetUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"=\n" +
 	"\x1aGetUserByTelegramIDRequest\x12\x1f\n" +
@@ -1333,8 +1439,9 @@ const file_pkg_proto_user_user_proto_rawDesc = "" +
 	"\x16new_event_notification\x18\x01 \x01(\bR\x14newEventNotification\"D\n" +
 	"\x0eSimpleResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xae\b\n" +
-	"\x15JollyRogerUserService\x123\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xf2\b\n" +
+	"\x15JollyRogerUserService\x12B\n" +
+	"\vHealthCheck\x12\x18.user.HealthCheckRequest\x1a\x19.user.HealthCheckResponse\x123\n" +
 	"\aGetUser\x12\x14.user.GetUserRequest\x1a\x12.user.UserResponse\x12K\n" +
 	"\x13GetUserByTelegramID\x12 .user.GetUserByTelegramIDRequest\x1a\x12.user.UserResponse\x129\n" +
 	"\n" +
@@ -1364,67 +1471,73 @@ func file_pkg_proto_user_user_proto_rawDescGZIP() []byte {
 	return file_pkg_proto_user_user_proto_rawDescData
 }
 
-var file_pkg_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_pkg_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_pkg_proto_user_user_proto_goTypes = []any{
-	(*GetUserRequest)(nil),                    // 0: user.GetUserRequest
-	(*GetUserByTelegramIDRequest)(nil),        // 1: user.GetUserByTelegramIDRequest
-	(*CreateUserRequest)(nil),                 // 2: user.CreateUserRequest
-	(*UpdateUserRequest)(nil),                 // 3: user.UpdateUserRequest
-	(*UserResponse)(nil),                      // 4: user.UserResponse
-	(*AddUserPreferenceRequest)(nil),          // 5: user.AddUserPreferenceRequest
-	(*RemoveUserPreferenceRequest)(nil),       // 6: user.RemoveUserPreferenceRequest
-	(*GetUserPreferencesRequest)(nil),         // 7: user.GetUserPreferencesRequest
-	(*UserPreference)(nil),                    // 8: user.UserPreference
-	(*UserPreferencesResponse)(nil),           // 9: user.UserPreferencesResponse
-	(*UpdateUserLocationRequest)(nil),         // 10: user.UpdateUserLocationRequest
-	(*GetUserLocationRequest)(nil),            // 11: user.GetUserLocationRequest
-	(*UserLocationResponse)(nil),              // 12: user.UserLocationResponse
-	(*FindNearbyUsersRequest)(nil),            // 13: user.FindNearbyUsersRequest
-	(*UsersResponse)(nil),                     // 14: user.UsersResponse
-	(*GetUserStatsRequest)(nil),               // 15: user.GetUserStatsRequest
-	(*UserStatsResponse)(nil),                 // 16: user.UserStatsResponse
-	(*UpdateUserRatingRequest)(nil),           // 17: user.UpdateUserRatingRequest
-	(*UpdateNotificationSettingsRequest)(nil), // 18: user.UpdateNotificationSettingsRequest
-	(*GetNotificationSettingsRequest)(nil),    // 19: user.GetNotificationSettingsRequest
-	(*NotificationSettingsResponse)(nil),      // 20: user.NotificationSettingsResponse
-	(*SimpleResponse)(nil),                    // 21: user.SimpleResponse
+	(*HealthCheckRequest)(nil),                // 0: user.HealthCheckRequest
+	(*HealthCheckResponse)(nil),               // 1: user.HealthCheckResponse
+	(*GetUserRequest)(nil),                    // 2: user.GetUserRequest
+	(*GetUserByTelegramIDRequest)(nil),        // 3: user.GetUserByTelegramIDRequest
+	(*CreateUserRequest)(nil),                 // 4: user.CreateUserRequest
+	(*UpdateUserRequest)(nil),                 // 5: user.UpdateUserRequest
+	(*UserResponse)(nil),                      // 6: user.UserResponse
+	(*AddUserPreferenceRequest)(nil),          // 7: user.AddUserPreferenceRequest
+	(*RemoveUserPreferenceRequest)(nil),       // 8: user.RemoveUserPreferenceRequest
+	(*GetUserPreferencesRequest)(nil),         // 9: user.GetUserPreferencesRequest
+	(*UserPreference)(nil),                    // 10: user.UserPreference
+	(*UserPreferencesResponse)(nil),           // 11: user.UserPreferencesResponse
+	(*UpdateUserLocationRequest)(nil),         // 12: user.UpdateUserLocationRequest
+	(*GetUserLocationRequest)(nil),            // 13: user.GetUserLocationRequest
+	(*UserLocationResponse)(nil),              // 14: user.UserLocationResponse
+	(*FindNearbyUsersRequest)(nil),            // 15: user.FindNearbyUsersRequest
+	(*UsersResponse)(nil),                     // 16: user.UsersResponse
+	(*GetUserStatsRequest)(nil),               // 17: user.GetUserStatsRequest
+	(*UserStatsResponse)(nil),                 // 18: user.UserStatsResponse
+	(*UpdateUserRatingRequest)(nil),           // 19: user.UpdateUserRatingRequest
+	(*UpdateNotificationSettingsRequest)(nil), // 20: user.UpdateNotificationSettingsRequest
+	(*GetNotificationSettingsRequest)(nil),    // 21: user.GetNotificationSettingsRequest
+	(*NotificationSettingsResponse)(nil),      // 22: user.NotificationSettingsResponse
+	(*SimpleResponse)(nil),                    // 23: user.SimpleResponse
+	nil,                                       // 24: user.HealthCheckResponse.ServicesEntry
 }
 var file_pkg_proto_user_user_proto_depIdxs = []int32{
-	8,  // 0: user.UserPreferencesResponse.preferences:type_name -> user.UserPreference
-	4,  // 1: user.UsersResponse.users:type_name -> user.UserResponse
-	0,  // 2: user.JollyRogerUserService.GetUser:input_type -> user.GetUserRequest
-	1,  // 3: user.JollyRogerUserService.GetUserByTelegramID:input_type -> user.GetUserByTelegramIDRequest
-	2,  // 4: user.JollyRogerUserService.CreateUser:input_type -> user.CreateUserRequest
-	3,  // 5: user.JollyRogerUserService.UpdateUser:input_type -> user.UpdateUserRequest
-	5,  // 6: user.JollyRogerUserService.AddUserPreference:input_type -> user.AddUserPreferenceRequest
-	6,  // 7: user.JollyRogerUserService.RemoveUserPreference:input_type -> user.RemoveUserPreferenceRequest
-	7,  // 8: user.JollyRogerUserService.GetUserPreferences:input_type -> user.GetUserPreferencesRequest
-	10, // 9: user.JollyRogerUserService.UpdateUserLocation:input_type -> user.UpdateUserLocationRequest
-	11, // 10: user.JollyRogerUserService.GetUserLocation:input_type -> user.GetUserLocationRequest
-	13, // 11: user.JollyRogerUserService.FindNearbyUsers:input_type -> user.FindNearbyUsersRequest
-	15, // 12: user.JollyRogerUserService.GetUserStats:input_type -> user.GetUserStatsRequest
-	17, // 13: user.JollyRogerUserService.UpdateUserRating:input_type -> user.UpdateUserRatingRequest
-	18, // 14: user.JollyRogerUserService.UpdateNotificationSettings:input_type -> user.UpdateNotificationSettingsRequest
-	19, // 15: user.JollyRogerUserService.GetNotificationSettings:input_type -> user.GetNotificationSettingsRequest
-	4,  // 16: user.JollyRogerUserService.GetUser:output_type -> user.UserResponse
-	4,  // 17: user.JollyRogerUserService.GetUserByTelegramID:output_type -> user.UserResponse
-	4,  // 18: user.JollyRogerUserService.CreateUser:output_type -> user.UserResponse
-	4,  // 19: user.JollyRogerUserService.UpdateUser:output_type -> user.UserResponse
-	21, // 20: user.JollyRogerUserService.AddUserPreference:output_type -> user.SimpleResponse
-	21, // 21: user.JollyRogerUserService.RemoveUserPreference:output_type -> user.SimpleResponse
-	9,  // 22: user.JollyRogerUserService.GetUserPreferences:output_type -> user.UserPreferencesResponse
-	21, // 23: user.JollyRogerUserService.UpdateUserLocation:output_type -> user.SimpleResponse
-	12, // 24: user.JollyRogerUserService.GetUserLocation:output_type -> user.UserLocationResponse
-	14, // 25: user.JollyRogerUserService.FindNearbyUsers:output_type -> user.UsersResponse
-	16, // 26: user.JollyRogerUserService.GetUserStats:output_type -> user.UserStatsResponse
-	4,  // 27: user.JollyRogerUserService.UpdateUserRating:output_type -> user.UserResponse
-	21, // 28: user.JollyRogerUserService.UpdateNotificationSettings:output_type -> user.SimpleResponse
-	20, // 29: user.JollyRogerUserService.GetNotificationSettings:output_type -> user.NotificationSettingsResponse
-	16, // [16:30] is the sub-list for method output_type
-	2,  // [2:16] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	24, // 0: user.HealthCheckResponse.services:type_name -> user.HealthCheckResponse.ServicesEntry
+	10, // 1: user.UserPreferencesResponse.preferences:type_name -> user.UserPreference
+	6,  // 2: user.UsersResponse.users:type_name -> user.UserResponse
+	0,  // 3: user.JollyRogerUserService.HealthCheck:input_type -> user.HealthCheckRequest
+	2,  // 4: user.JollyRogerUserService.GetUser:input_type -> user.GetUserRequest
+	3,  // 5: user.JollyRogerUserService.GetUserByTelegramID:input_type -> user.GetUserByTelegramIDRequest
+	4,  // 6: user.JollyRogerUserService.CreateUser:input_type -> user.CreateUserRequest
+	5,  // 7: user.JollyRogerUserService.UpdateUser:input_type -> user.UpdateUserRequest
+	7,  // 8: user.JollyRogerUserService.AddUserPreference:input_type -> user.AddUserPreferenceRequest
+	8,  // 9: user.JollyRogerUserService.RemoveUserPreference:input_type -> user.RemoveUserPreferenceRequest
+	9,  // 10: user.JollyRogerUserService.GetUserPreferences:input_type -> user.GetUserPreferencesRequest
+	12, // 11: user.JollyRogerUserService.UpdateUserLocation:input_type -> user.UpdateUserLocationRequest
+	13, // 12: user.JollyRogerUserService.GetUserLocation:input_type -> user.GetUserLocationRequest
+	15, // 13: user.JollyRogerUserService.FindNearbyUsers:input_type -> user.FindNearbyUsersRequest
+	17, // 14: user.JollyRogerUserService.GetUserStats:input_type -> user.GetUserStatsRequest
+	19, // 15: user.JollyRogerUserService.UpdateUserRating:input_type -> user.UpdateUserRatingRequest
+	20, // 16: user.JollyRogerUserService.UpdateNotificationSettings:input_type -> user.UpdateNotificationSettingsRequest
+	21, // 17: user.JollyRogerUserService.GetNotificationSettings:input_type -> user.GetNotificationSettingsRequest
+	1,  // 18: user.JollyRogerUserService.HealthCheck:output_type -> user.HealthCheckResponse
+	6,  // 19: user.JollyRogerUserService.GetUser:output_type -> user.UserResponse
+	6,  // 20: user.JollyRogerUserService.GetUserByTelegramID:output_type -> user.UserResponse
+	6,  // 21: user.JollyRogerUserService.CreateUser:output_type -> user.UserResponse
+	6,  // 22: user.JollyRogerUserService.UpdateUser:output_type -> user.UserResponse
+	23, // 23: user.JollyRogerUserService.AddUserPreference:output_type -> user.SimpleResponse
+	23, // 24: user.JollyRogerUserService.RemoveUserPreference:output_type -> user.SimpleResponse
+	11, // 25: user.JollyRogerUserService.GetUserPreferences:output_type -> user.UserPreferencesResponse
+	23, // 26: user.JollyRogerUserService.UpdateUserLocation:output_type -> user.SimpleResponse
+	14, // 27: user.JollyRogerUserService.GetUserLocation:output_type -> user.UserLocationResponse
+	16, // 28: user.JollyRogerUserService.FindNearbyUsers:output_type -> user.UsersResponse
+	18, // 29: user.JollyRogerUserService.GetUserStats:output_type -> user.UserStatsResponse
+	6,  // 30: user.JollyRogerUserService.UpdateUserRating:output_type -> user.UserResponse
+	23, // 31: user.JollyRogerUserService.UpdateNotificationSettings:output_type -> user.SimpleResponse
+	22, // 32: user.JollyRogerUserService.GetNotificationSettings:output_type -> user.NotificationSettingsResponse
+	18, // [18:33] is the sub-list for method output_type
+	3,  // [3:18] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_pkg_proto_user_user_proto_init() }
@@ -1438,7 +1551,7 @@ func file_pkg_proto_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_proto_user_user_proto_rawDesc), len(file_pkg_proto_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

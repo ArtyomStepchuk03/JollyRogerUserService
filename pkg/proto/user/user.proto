@@ -4,6 +4,9 @@ package user;
 option go_package = "JollyRogerUserService/pkg/proto/user";
 
 service JollyRogerUserService {
+  // Health check
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+
   // Управление профилем
   rpc GetUser(GetUserRequest) returns (UserResponse);
   rpc GetUserByTelegramID(GetUserByTelegramIDRequest) returns (UserResponse);
@@ -29,7 +32,16 @@ service JollyRogerUserService {
   rpc GetNotificationSettings(GetNotificationSettingsRequest) returns (NotificationSettingsResponse);
 }
 
-// Запросы и ответы
+// HealthCheckRequest - запрос для проверки состояния сервиса
+message HealthCheckRequest {
+}
+
+// HealthCheckResponse - ответ о состоянии сервиса
+message HealthCheckResponse {
+  string status = 1; // "ok", "degraded", "down"
+  map<string, string> services = 2; // статусы для отдельных сервисов
+  int64 timestamp = 3; // Unix timestamp
+}
 
 // GetUserRequest - запрос для получения пользователя по ID
 message GetUserRequest {

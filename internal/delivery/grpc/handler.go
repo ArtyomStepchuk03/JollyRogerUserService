@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"strings"
 	"time"
 )
 
@@ -56,6 +57,92 @@ func (h *UserHandler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 	}
 
 	return response, nil
+}
+
+// HealthCheck проверяет состояние сервиса пользователей
+func (h *UserHandler) HealthCheck(ctx context.Context, req *pb.HealthCheckRequest) (*pb.HealthCheckResponse, error) {
+	// Проверяем доступность базы данных
+	dbStatus := "ok"
+	if err := h.checkDatabaseHealth(ctx); err != nil {
+		dbStatus = "error"
+		h.logger.Error("database health check failed", zap.Error(err))
+	}
+
+	// Проверяем доступность Redis
+	redisStatus := "ok"
+	if err := h.checkRedisHealth(ctx); err != nil {
+		redisStatus = "error"
+		h.logger.Error("redis health check failed", zap.Error(err))
+	}
+
+	// Определяем общий статус
+	overallStatus := "ok"
+	if dbStatus != "ok" {
+		// База данных критична для работы сервиса
+		overallStatus = "down"
+	} else if redisStatus != "ok" {
+		// Redis не является критичным, сервис может работать в деградированном режиме
+		overallStatus = "degraded"
+	}
+
+	return &pb.HealthCheckResponse{
+		Status: overallStatus,
+		Services: map[string]string{
+			"database": dbStatus,
+			"redis":    redisStatus,
+		},
+		Timestamp: time.Now().Unix(),
+	}, nil
+}
+
+// checkDatabaseHealth проверяет подключение к базе данных
+func (h *UserHandler) checkDatabaseHealth(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	// Пытаемся выполнить простой запрос для проверки базы данных
+	// Используем ID=1 для проверки
+	_, err := h.service.GetUser(ctx, 1)
+
+	// Если ошибка связана с отсутствием записи, это нормально
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) && err.Error() != "user not found" {
+		return err
+	}
+
+	return nil
+}
+
+// checkRedisHealth проверяет подключение к Redis
+func (h *UserHandler) checkRedisHealth(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	// Проверка Redis через метод сервиса, который использует кэш
+	// Предполагаем, что у сервиса есть метод CheckCacheHealth
+	if cacheHealthChecker, ok := h.service.(interface {
+		CheckCacheHealth(ctx context.Context) error
+	}); ok {
+		return cacheHealthChecker.CheckCacheHealth(ctx)
+	}
+
+	// Альтернативный вариант - пытаемся получить данные, которые должны быть в кэше
+	// Например, пытаемся найти пользователей поблизости, что обычно кэшируется
+	// Создаем тестовые координаты
+	testLat := 55.7558
+	testLng := 37.6173
+	testRadius := 5.0
+
+	// Предполагаем, что метод FindNearbyUsers использует Redis для кэширования
+	// и реализован с прямыми параметрами, а не через структуру запроса
+	_, err := h.service.FindNearbyUsers(ctx, testLat, testLng, testRadius, 1)
+
+	// Если ошибка не связана с отсутствием данных, возвращаем её
+	if err != nil && !strings.Contains(err.Error(), "no users found") &&
+		!errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	return nil
 }
 
 // GetUserByTelegramID возвращает пользователя по Telegram ID

@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	JollyRogerUserService_HealthCheck_FullMethodName                = "/user.JollyRogerUserService/HealthCheck"
 	JollyRogerUserService_GetUser_FullMethodName                    = "/user.JollyRogerUserService/GetUser"
 	JollyRogerUserService_GetUserByTelegramID_FullMethodName        = "/user.JollyRogerUserService/GetUserByTelegramID"
 	JollyRogerUserService_CreateUser_FullMethodName                 = "/user.JollyRogerUserService/CreateUser"
@@ -39,6 +40,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JollyRogerUserServiceClient interface {
+	// Health check
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 	// Управление профилем
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserByTelegramID(ctx context.Context, in *GetUserByTelegramIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -66,6 +69,16 @@ type jollyRogerUserServiceClient struct {
 
 func NewJollyRogerUserServiceClient(cc grpc.ClientConnInterface) JollyRogerUserServiceClient {
 	return &jollyRogerUserServiceClient{cc}
+}
+
+func (c *jollyRogerUserServiceClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, JollyRogerUserService_HealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *jollyRogerUserServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
@@ -212,6 +225,8 @@ func (c *jollyRogerUserServiceClient) GetNotificationSettings(ctx context.Contex
 // All implementations must embed UnimplementedJollyRogerUserServiceServer
 // for forward compatibility.
 type JollyRogerUserServiceServer interface {
+	// Health check
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	// Управление профилем
 	GetUser(context.Context, *GetUserRequest) (*UserResponse, error)
 	GetUserByTelegramID(context.Context, *GetUserByTelegramIDRequest) (*UserResponse, error)
@@ -241,6 +256,9 @@ type JollyRogerUserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedJollyRogerUserServiceServer struct{}
 
+func (UnimplementedJollyRogerUserServiceServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
 func (UnimplementedJollyRogerUserServiceServer) GetUser(context.Context, *GetUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
@@ -288,7 +306,7 @@ func (UnimplementedJollyRogerUserServiceServer) testEmbeddedByValue()           
 
 // UnsafeJollyRogerUserServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to JollyRogerUserServiceServer will
-// result in compilation apperrors.
+// result in compilation errors.
 type UnsafeJollyRogerUserServiceServer interface {
 	mustEmbedUnimplementedJollyRogerUserServiceServer()
 }
@@ -302,6 +320,24 @@ func RegisterJollyRogerUserServiceServer(s grpc.ServiceRegistrar, srv JollyRoger
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&JollyRogerUserService_ServiceDesc, srv)
+}
+
+func _JollyRogerUserService_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JollyRogerUserServiceServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JollyRogerUserService_HealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JollyRogerUserServiceServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _JollyRogerUserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -563,6 +599,10 @@ var JollyRogerUserService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "user.JollyRogerUserService",
 	HandlerType: (*JollyRogerUserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "HealthCheck",
+			Handler:    _JollyRogerUserService_HealthCheck_Handler,
+		},
 		{
 			MethodName: "GetUser",
 			Handler:    _JollyRogerUserService_GetUser_Handler,

@@ -9,7 +9,6 @@ import (
 
 // AppConfig содержит конфигурацию для всего приложения
 type AppConfig struct {
-	AppEnv   string // Среда приложения (development, staging, production)
 	Version  string // Версия приложения
 	LogLevel string // Уровень логирования
 }
@@ -52,14 +51,11 @@ func LoadConfig() (*Config, error) {
 		// Продолжаем работать с переменными окружения
 	}
 
-	// Конфигурация приложения
-	appEnv := getEnv("APP_ENV", "development") // По умолчанию development
-	version := getEnv("APP_VERSION", "1.0.0")  // По умолчанию версия 1.0.0
-	logLevel := getEnv("LOG_LEVEL", "info")    // По умолчанию info
+	version := getEnv("APP_VERSION", "1.0.0") // По умолчанию версия 1.0.0
+	logLevel := getEnv("LOG_LEVEL", "info")   // По умолчанию info
 
 	config := &Config{
 		App: AppConfig{
-			AppEnv:   appEnv,
 			Version:  version,
 			LogLevel: logLevel,
 		},

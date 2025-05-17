@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"JollyRogerUserService/config"
-	"JollyRogerUserService/internal/database/seed"
 	"JollyRogerUserService/internal/delivery/grpc"
 	"JollyRogerUserService/internal/repository/postgres"
 	"JollyRogerUserService/internal/repository/redis"
@@ -81,16 +80,6 @@ func main() {
 		log.Info("Закрытие соединения с Redis")
 		return redisClient.Close()
 	})
-
-	// Заполняем данными разработки, если нужно
-	if cfg.App.AppEnv == "development" {
-		log.Info("Обнаружена среда разработки, заполняем тестовыми данными")
-		seeder := seed.NewDevEnvironmentSeeder(db, log)
-		if err := seeder.SeedAllDevData(context.Background()); err != nil {
-			log.Warn("Не удалось заполнить данными разработки", zap.Error(err))
-			// Мы не хотим прерывать запуск, если заполнение не удалось
-		}
-	}
 
 	// Создаем проверку здоровья баз данных
 	healthChecker := database.NewDatabaseHealthChecker(db, redisClient, log)
